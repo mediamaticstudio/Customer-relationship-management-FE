@@ -1,115 +1,117 @@
 /* ================================
    LEAD TRACKING PAGE
 ================================ */
-body{
-   background: var(--cream-bg);
 
-}
 .tracking-page {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 30px;
-  background: var(--cream-bg);
-  border-radius: 14px;
-  box-shadow: var(--shadow-soft);
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 60px 40px;
+  background: var(--card-bg);
+  border-radius: 30px;
+  box-shadow: var(--shadow-medium);
   color: var(--text-dark);
-  animation: fadeIn 0.3s ease-in-out;
+  border: 1px solid var(--border-soft);
+  animation: slideUp 0.4s ease-out;
 }
 
 /* ================================
    HEADER
 ================================ */
 .tracking-page h3 {
-  margin: 20px 0 25px;
-  font-size: 22px;
-  font-weight: 600;
+  margin: 32px 0 48px;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: var(--primary-dark);
-  border-left: 5px solid var(--primary-mid);
-  padding-left: 12px;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  position: relative;
+  display: inline-block;
+}
+
+.tracking-page h3::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-light);
+  border-radius: 2px;
 }
 
 /* ================================
    BACK BUTTON
 ================================ */
-.back-btn {
-  background: var(--btn-bg);
-  color: var(--text-light);
-  border: none;
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.back-btn:hover {
-  background: var(--btn-hover);
-  transform: translateX(-2px);
-}
 
 /* ================================
    TABLE
 ================================ */
 .tracking-table {
   width: 100%;
-  border-collapse: collapse;
-  background: var(--card-bg);
-  border-radius: 10px;
-  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0 12px;
 }
 
 /* Header */
 .tracking-table thead {
-  background: linear-gradient(
-    90deg,
-    var(--primary-dark),
-    var(--primary-mid)
-  );
+  background: transparent;
 }
 
 .tracking-table th {
-  padding: 14px 16px;
-  font-size: 14px;
+  padding: 16px 24px;
+  font-size: 0.85rem;
   text-align: left;
-  color: var(--text-light);
-  font-weight: 600;
+  color: var(--primary-mid);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 800;
 }
 
 /* Body */
+.tracking-table tbody tr {
+  background: var(--card-bg);
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
 .tracking-table td {
-  padding: 14px 16px;
-  font-size: 14px;
-  border-bottom: 1px solid var(--border-soft);
+  padding: 24px;
+  font-size: 1rem;
   color: var(--text-dark);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
 }
 
-/* Zebra rows */
-.tracking-table tbody tr:nth-child(even) {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-/* Hover */
-.tracking-table tbody tr:hover {
-  background: rgba(154, 90, 42, 0.08);
-}
-
-/* ================================
-   STATUS STYLING
-================================ */
 .tracking-table td:first-child {
-  font-weight: 600;
+  border-left: 1px solid var(--border-soft);
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+  font-weight: 800;
   color: var(--primary-dark);
-  text-transform: capitalize;
 }
 
-/* ================================
-   EMPTY STATE
-================================ */
-.tracking-table tbody tr td[colspan] {
-  text-align: center;
-  padding: 30px;
-  color: var(--text-muted);
-  font-style: italic;
+.tracking-table td:last-child {
+  border-right: 1px solid var(--border-soft);
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.tracking-table tbody tr:hover {
+  transform: scale(1.01);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--primary-light);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--input-bg);
+  color: var(--primary-dark);
+  text-transform: uppercase;
 }
 
 /* ================================
@@ -118,52 +120,57 @@ body{
 @media (max-width: 768px) {
   .tracking-page {
     margin: 20px;
-    padding: 20px;
+    padding: 32px 20px;
+    border-radius: 24px;
+  }
+
+  .tracking-page h3 {
+    font-size: 1.75rem;
+    margin-bottom: 32px;
   }
 
   .tracking-table thead {
     display: none;
   }
 
-  .tracking-table,
-  .tracking-table tbody,
-  .tracking-table tr,
-  .tracking-table td {
+  .tracking-table tbody tr {
     display: block;
-    width: 100%;
-  }
-
-  .tracking-table tr {
-    margin-bottom: 15px;
-    border-radius: 10px;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
-    background: var(--card-bg);
+    margin-bottom: 24px;
+    border-radius: 20px;
+    border: 1px solid var(--border-soft);
+    padding: 16px;
   }
 
   .tracking-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 0.95rem;
+  }
+
+  .tracking-table td:last-child {
     border-bottom: none;
-    position: relative;
-    padding-left: 50%;
   }
 
   .tracking-table td::before {
     content: attr(data-label);
-    position: absolute;
-    left: 16px;
-    top: 14px;
-    font-weight: 600;
-    color: var(--primary-dark);
+    font-weight: 800;
+    color: var(--primary-mid);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding-right: 15px;
+    flex-shrink: 0;
   }
 }
 
-/* ================================
-   ANIMATION
-================================ */
-@keyframes fadeIn {
+@keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

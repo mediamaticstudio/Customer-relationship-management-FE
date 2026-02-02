@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../styles/ResetPassword.css";
+import { API_BASE_URL } from "../config.jsx";
 
 export const ResetPassword = () => {
   const { token } = useParams();
@@ -26,7 +27,7 @@ export const ResetPassword = () => {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/auth/reset-password/${token}/`,
+        `${API_BASE_URL}/api/auth/reset-password/${token}/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -45,7 +46,7 @@ export const ResetPassword = () => {
       }
     } catch (err) {
       setError("Server error. Please try again.");
-      toast.error("Server error. Please try again.",err);
+      toast.error("Server error. Please try again.", err);
     } finally {
       setLoading(false);
     }

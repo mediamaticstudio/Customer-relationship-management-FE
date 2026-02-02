@@ -1,0 +1,125 @@
+/* ================= CONTAINER ================= */
+.lead-container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: var(--card-bg);
+  padding: 32px 36px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-medium);
+}
+
+/* ================= HEADER ================= */
+.lead-container h2 {
+  color: var(--primary-dark);
+  margin-bottom: 28px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* ================= BACK BUTTON ================= */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--primary-dark);
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.back-btn:hover {
+  color: var(--primary-mid);
+}
+
+/* ================= FORM LAYOUT ================= */
+.lead-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* ================= FORM SECTIONS ================= */
+.left-form,
+.right-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= INPUTS ================= */
+.lead-form input,
+.lead-form textarea {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--input-bg);
+  color: var(--text-dark);
+  font-size: 14px;
+  margin-bottom: 12px;
+  transition: 0.2s ease;
+}
+
+.lead-form input::placeholder,
+.lead-form textarea::placeholder {
+  color: var(--text-muted-dark);
+}
+
+.lead-form input:focus,
+.lead-form textarea:focus {
+  outline: none;
+  border-color: var(--primary-mid);
+  box-shadow: 0 0 0 2px rgba(122, 37, 48, 0.15);
+}
+
+/* ================= TEXTAREA ================= */
+.lead-form textarea {
+  resize: none;
+  min-height: 90px;
+}
+
+/* ================= ADDRESS ================= */
+.address-row {
+  display: flex;
+  gap: 12px;
+}
+
+.address-row input {
+  flex: 1;
+}
+
+/* ================= BUTTON ================= */
+.lead-form button {
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--btn-bg);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.lead-form button:hover {
+  background: var(--btn-hover);
+  transform: translateY(-1px);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .lead-form {
+    grid-template-columns: 1fr;
+  }
+
+  .address-row {
+    flex-direction: column;
+  }
+
+  .lead-container {
+    margin: 20px;
+    padding: 24px;
+  }
+}

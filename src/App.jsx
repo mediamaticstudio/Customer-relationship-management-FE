@@ -17,9 +17,17 @@ import AddUser from "./configuration/AddUser";
 import LeadStatusTracking from "./Buckets/LeadTracking";
 import { Reports } from "./reports/Reports";
 import LeadsReports from "./reports/LeadsReports"
-import { Leads } from "./Buckets/Leads";
+import AddLead from "./Buckets/AddLead";
+import { ContactSupport } from "./components/ContactSupport";
+
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }, []);
+
   return (
     <>
       <ToastContainer
@@ -36,15 +44,17 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/assigned" element={<Assigned />} />
-        <Route path="/reports" element={<Reports/>} />
-         <Route path="/leads/:id" element={<LeadData />} />
-         <Route path="/leads/:id/tracking" element={<LeadStatusTracking/>} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/leads/:id" element={<LeadData />} />
+        <Route path="/leads/:id/tracking" element={<LeadStatusTracking />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/adduser" element={<AddUser/>}/>
-        <Route path="/reports" element={<Reports/>}/>
-        <Route path="/leadreports" element={<LeadsReports/>}/>
+        <Route path="/adduser" element={<AddUser />} />
+        <Route path="/create" element={<AddLead />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/leadreports" element={<LeadsReports />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/support" element={<ContactSupport />} />
       </Routes>
     </>
   );

@@ -1,0 +1,287 @@
+/* ================================
+   REPORTS PAGE
+================================ */
+
+.reports-wrapper {
+    min-height: 100vh;
+    background: var(--cream-bg);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.reports-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.reports-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+}
+
+
+/* ================================
+   CONTROLS / FILTERS CONTAINER
+================================ */
+.reports-controls-container {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(91, 29, 38, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.reports-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(91, 29, 38, 0.1);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 200px;
+}
+
+.control-group label,
+.filter-item label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Legacy Inputs (native selects/dates) */
+.legacy-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    background: var(--input-bg);
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    height: 44px;
+    /* Match React Select height */
+}
+
+.legacy-input:focus {
+    outline: none;
+    border-color: var(--primary-mid);
+    box-shadow: 0 0 0 2px rgba(122, 37, 48, 0.1);
+}
+
+/* Grid for Detailed Filters */
+.filters-grid-report {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Action Row (Buttons) */
+.action-row {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid rgba(91, 29, 38, 0.1);
+}
+
+.apply-report-btn {
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(91, 29, 38, 0.2);
+}
+
+.apply-report-btn:hover {
+    background: var(--primary-mid);
+    transform: translateY(-2px);
+}
+
+.apply-report-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ================================
+   TABLE
+================================ */
+.reports-table-container {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-soft);
+    overflow-x: auto;
+}
+
+.reports-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.reports-table th {
+    padding: 16px;
+    text-align: left;
+    font-size: 0.85rem;
+    color: var(--primary-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    background: var(--cream-bg);
+    /* Subtle header bg */
+    border-bottom: 2px solid var(--border-soft);
+}
+
+.reports-table td {
+    padding: 16px;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.reports-table tr:last-child td {
+    border-bottom: none;
+}
+
+.reports-table tr:hover td {
+    background: rgba(154, 90, 42, 0.05);
+}
+
+/* Card Styling for Menu Page (Reports.jsx) */
+/* Reusing some classes but updating for new consistent look */
+.card-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    transition: transform 0.3s ease;
+}
+
+.settings-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+}
+
+.settings-card:hover .card-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.settings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 32px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .reports-wrapper {
+        padding: 60px 20px 20px;
+    }
+
+    .reports-title {
+        font-size: 1.6rem;
+    }
+
+    .reports-controls-container {
+        padding: 20px;
+    }
+
+    .reports-controls-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .control-group {
+        min-width: 100%;
+    }
+
+    .filters-grid-report {
+        grid-template-columns: 1fr;
+    }
+
+    .reports-table thead {
+        display: none;
+    }
+
+    .reports-table,
+    .reports-table tbody,
+    .reports-table tr,
+    .reports-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .reports-table tr {
+        margin-bottom: 20px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-soft);
+        border-radius: 16px;
+        padding: 15px;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .reports-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-soft);
+        text-align: right;
+    }
+
+    .reports-table td:last-child {
+        border-bottom: none;
+    }
+
+    .reports-table td::before {
+        content: attr(data-label);
+        font-weight: 800;
+        color: var(--primary-mid);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+        margin-right: 15px;
+        text-align: left;
+    }
+}

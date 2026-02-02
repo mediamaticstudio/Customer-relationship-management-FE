@@ -1,4 +1,4 @@
-import React, { useEffect, useState ,useCallback} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Sidebar } from "../components/Sidebar";
 import "../styles/Assigned.css";
 import axios from "axios";
@@ -7,9 +7,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AgentList } from "./AgentList";
 import { toast } from "react-toastify";
 import UserDashBoard from "../components/UserDashBoard";
+import { API_BASE_URL } from "../config.jsx";
 
-const API = "http://127.0.0.1:8000/crm/leads/";
-const API_URL = "http://127.0.0.1:8000/crm/get/lead/"; // change if needed
+const API = `${API_BASE_URL}/crm/leads/`;
+const API_URL = `${API_BASE_URL}/crm/get/lead/`; // change if needed
 
 
 export const Assigned = () => {
@@ -36,14 +37,14 @@ export const Assigned = () => {
   const [selectedLeads, setSelectedLeads] = useState([]); //  MULTI SELECT
   const [agents, setAgents] = useState([]);
   const [assigning, setAssigning] = useState(false);
-  const [today,setToday] = useState(false)
+  const [today, setToday] = useState(false)
 
   const [filters, setFilters] = useState({
     name: "",
     company: "",
     region: "",
   });
-  
+
   /* ================= SYNC URL → STATE ================= */
   useEffect(() => {
     setSelectedStatus(statusFromUrl);
@@ -58,122 +59,122 @@ export const Assigned = () => {
 
   /* ================= FETCH LEADS ================= */
 
-// useEffect(() => {
-//   let ignore = false;
+  // useEffect(() => {
+  //   let ignore = false;
 
-//   const fetchLeads = async () => {
-//     setLoading(true);
-//     try {
-//       const res = await axios.get( `${API}`, {
-//         params: {
-//           status: selectedStatus,
-//           page,
-//           page_size: pageSize,
-//           search,
-//           name: filters.name,
-//           company: filters.company,
-//           region: filters.region,
-//           today
-//         },
-//         headers: {
-//           Authorization: `Bearer ${localStorage.getItem("access")}`,
-//         },
-//       });
+  //   const fetchLeads = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const res = await axios.get( `${API}`, {
+  //         params: {
+  //           status: selectedStatus,
+  //           page,
+  //           page_size: pageSize,
+  //           search,
+  //           name: filters.name,
+  //           company: filters.company,
+  //           region: filters.region,
+  //           today
+  //         },
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("access")}`,
+  //         },
+  //       });
 
-//       if (!ignore) {
-//         setLeads(res.data?.data || []);
-//         setTotalCount(res.data?.count || 0);
-//       }
-//     } catch (error) {
-//       if (error.response?.status === 401) {
-//         localStorage.clear();
-//         navigate("/login");
-//       } else {
-//         // Show any other backend error in toast
-//         const backendMessage =
-//           error.response?.data?.message ||
-//           error.response?.data?.error ||
-//           error.message ||
-//           "Something went wrong";
-//         toast.error(backendMessage);
-//       }
-//     } finally {
-//       if (!ignore) setLoading(false);
-//     }
-//   };
+  //       if (!ignore) {
+  //         setLeads(res.data?.data || []);
+  //         setTotalCount(res.data?.count || 0);
+  //       }
+  //     } catch (error) {
+  //       if (error.response?.status === 401) {
+  //         localStorage.clear();
+  //         navigate("/login");
+  //       } else {
+  //         // Show any other backend error in toast
+  //         const backendMessage =
+  //           error.response?.data?.message ||
+  //           error.response?.data?.error ||
+  //           error.message ||
+  //           "Something went wrong";
+  //         toast.error(backendMessage);
+  //       }
+  //     } finally {
+  //       if (!ignore) setLoading(false);
+  //     }
+  //   };
 
-//   fetchLeads();
-//   return () => (ignore = true);
-// }, [
-//           selectedStatus,
-//           page,
-//           today,
-//           pageSize,
-//           search,
-//           filters.name,
-//           filters.company,
-//           filters.region,
-//           navigate,
-//         ]);
+  //   fetchLeads();
+  //   return () => (ignore = true);
+  // }, [
+  //           selectedStatus,
+  //           page,
+  //           today,
+  //           pageSize,
+  //           search,
+  //           filters.name,
+  //           filters.company,
+  //           filters.region,
+  //           navigate,
+  //         ]);
 
-const fetchLeads = useCallback(async () => {
-  setLoading(true);
-  try {
-    const res = await axios.get(`${API}`, {
-      params: {
-        status: selectedStatus,
-        page,
-        page_size: pageSize,
-        search,
-        name: filters.name,
-        company: filters.company,
-        region: filters.region,
-        today,
-      },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access")}`,
-      },
-    });
+  const fetchLeads = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}`, {
+        params: {
+          status: selectedStatus,
+          page,
+          page_size: pageSize,
+          search,
+          name: filters.name,
+          company: filters.company,
+          region: filters.region,
+          today,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access")}`,
+        },
+      });
 
-    setLeads(res.data?.data || []);
-    setTotalCount(res.data?.count || 0);
-  } catch (error) {
-    if (error.response?.status === 401) {
-      localStorage.clear();
-      navigate("/login");
-    } else {
-      const backendMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Something went wrong";
-      toast.error(backendMessage);
+      setLeads(res.data?.data || []);
+      setTotalCount(res.data?.count || 0);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        navigate("/login");
+      } else {
+        const backendMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Something went wrong";
+        toast.error(backendMessage);
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-}, [
-  selectedStatus,
-  page,
-  pageSize,
-  search,
-  filters.name,
-  filters.company,
-  filters.region,
-  today,
-  navigate,
-]);
+  }, [
+    selectedStatus,
+    page,
+    pageSize,
+    search,
+    filters.name,
+    filters.company,
+    filters.region,
+    today,
+    navigate,
+  ]);
 
 
-useEffect(() => {
-  fetchLeads();
-      }, [fetchLeads]);
+  useEffect(() => {
+    fetchLeads();
+  }, [fetchLeads]);
 
   /* ================= FETCH AGENTS ================= */
   useEffect(() => {
     const fetchAgents = async () => {
       const res = await axios.get(
-        "http://127.0.0.1:8000/api/auth/userlist/",
+        `${API_BASE_URL}/api/auth/userlist/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access")}`,
@@ -234,12 +235,12 @@ useEffect(() => {
       );
       setSelectedLeads([]);
       setPage(1);
-      
+
       //  navigate("/assigned?status=unassigned", { replace: true });
       if (res.ok) {
         toast.warning(res.data.message || "Lead assigned successfully");
       } else {
-       setPage(1);   
+        setPage(1);
         toast.success(res.data.message || "Error");
       }
 
@@ -249,7 +250,7 @@ useEffect(() => {
       setAssigning(false);
     }
   };
- const assignLead = async () => {
+  const assignLead = async () => {
     setLoading(true);
     try {
       const res = await axios.post(
@@ -257,7 +258,7 @@ useEffect(() => {
         {},
         {
           headers: {
-             Authorization: `Bearer ${localStorage.getItem("access")}`,
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
           },
         }
       );
@@ -265,12 +266,12 @@ useEffect(() => {
       if (res.data.already_assigned) {
         toast.warning(res.data.message || "You already have a lead");
       } else {
-       setPage(1);   
+        setPage(1);
         toast.success(res.data.message || "Lead assigned successfully");
       }
       fetchLeads();
     } catch (error) {
-      toast.error("Unable to assign lead",error);
+      toast.error("Unable to assign lead", error);
     } finally {
       setLoading(false);
     }
@@ -285,32 +286,45 @@ useEffect(() => {
       </button>
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <Sidebar
-        totalCount ={totalCount}
+          totalCount={totalCount}
           selectedStatus={selectedStatus}
           onStatusChange={setSelectedStatus}
         />
       </aside>
 
-      <main className="main">   
+      <main className="main">
         <div className="content">
-           { user_role=="AGENT" &&<button
-            className="back-btn"  onClick={()=>{assignLead()
-          navigate("/assigned?status=assigned")
+          {user_role === "AGENT" && selectedStatus === "assigned" && <div className="assigned-dashboard-center"> <UserDashBoard setToday={setToday} />
+          </div>}
+          {user_role == "AGENT" && <div className="lead-btn"><button
+            className="back-btn" onClick={() => {
+              assignLead()
+              navigate("/assigned?status=assigned")
             }}
-          disabled={loading}
+            disabled={loading}
           >
             Get Lead
-          </button>}
+          </button>
+          <button
+            className="back-btn" onClick={() => {
+             
+              navigate("/create")
+            }}
+            disabled={loading}
+          >
+            Add Lead
+          </button> </div>
+          }
           {/* Header */}
-       {user_role!="AGENT" &&   <div className="table-header"> <div className="search-bar"> <input type="text" placeholder="Search by name, company or region..." className="search-input" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} /> <button className="clear-button" onClick={() => setSearch("")}> <FiX size={18} /> </button> </div> <div className="filter"> <button onClick={() => setShowFilter(true)} className="search-filter" > Filter </button> <button onClick={handleReset} className="reset-button"> <FiRotateCcw size={18} /> </button> </div> </div>}
+          {user_role != "AGENT" && <div className="table-header"> <div className="search-bar"> <input type="text" placeholder="Search by name, company or region..." className="search-input" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} /> <button className="clear-button" onClick={() => setSearch("")}> <FiX size={18} /> </button> </div> <div className="filter"> <button onClick={() => setShowFilter(true)} className="search-filter" > Filter </button> <button onClick={handleReset} className="reset-button"> <FiRotateCcw size={18} /> </button> </div> </div>}
 
           {/* Table */}
           <table className="leads">
             <thead>
               <tr>
-                {selectedStatus=="unassigned"&& <th>
+                {selectedStatus == "unassigned" && <th>
                   <input
-                  className="select-all"
+                    className="select-all"
                     type="checkbox"
                     checked={
                       leads.length > 0 &&
@@ -333,7 +347,7 @@ useEffect(() => {
               ) : (
                 leads.map((lead) => (
                   <tr key={lead.id}>
-                   {selectedStatus=="unassigned"&& <td>
+                    {selectedStatus == "unassigned" && <td>
                       <input
                         type="checkbox"
                         checked={selectedLeads.includes(lead.id)}
@@ -350,55 +364,68 @@ useEffect(() => {
               )}
             </tbody>
           </table>
-            {user_role === "AGENT" && selectedStatus==="assigned" &&<div className="assigned-dashboard-center"> <UserDashBoard setToday={setToday}/>
-            </div>}
           
-          {/* BULK CONTROLS BELOW TABLE */}
-         <div className="bulk-controls"> {selectedStatus=="unassigned"&&
-            
-             <AgentList handleBulkAssign={handleBulkAssign} assigning ={assigning} agents={agents} selectedLeads={selectedLeads}/>
-           }
-            {totalCount > 10 &&<select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-            >
-              {[10,25,50].map((n) => (
-                <option key={n} value={n}>
-                  {n} / page
-                </option>
-              ))}
-            </select>}
-          </div>
 
-          {/* Pagination */}
-          {!loading && totalPages > 1 && (
-            <div className="pagination">
-              <button disabled={page === 1} onClick={() => setPage(1)}>First</button>
-              <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>⬅ Prev</button>
-              <span>Page {page} of {totalPages}</span>
-              <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next ➡</button>
-              <button disabled={page === totalPages} onClick={() => setPage(totalPages)}>Last</button>
+
+          {/* BULK CONTROLS BELOW TABLE */}
+          <div className="bulk-controls">
+            <div className="bulk-left">
+              {selectedStatus === "unassigned" && (user_role === "ADMIN" || user_role === "SUPERADMIN") && (
+                <AgentList
+                  handleBulkAssign={handleBulkAssign}
+                  assigning={assigning}
+                  agents={agents}
+                  selectedLeads={selectedLeads}
+                />
+              )}
             </div>
-          )}
+
+            <div className="bulk-center">
+              {!loading && totalPages > 1 && (
+                <div className="pagination">
+                  <button disabled={page === 1} onClick={() => setPage(1)}>First</button>
+                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>⬅ Prev</button>
+                  <span>Page {page} of {totalPages}</span>
+                  <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next ➡</button>
+                  <button disabled={page === totalPages} onClick={() => setPage(totalPages)}>Last</button>
+                </div>
+              )}
+            </div>
+
+            <div className="bulk-right">
+              {totalCount > 10 && (
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {[10, 25, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {n} / page
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </div>
         </div>
       </main>
-      {/* Filter Modal */} 
-      {showFilter && ( <>
-       <div className="filter-overlay" onClick={() => setShowFilter(false)} /> 
+      {/* Filter Modal */}
+      {showFilter && (<>
+        <div className="filter-overlay" onClick={() => setShowFilter(false)} />
         <div className="filter-panel">
-           <h3>Filter Leads</h3>
-            {["name", "company", "region"].map((key) => (
-               <div className="filter-group" key={key}> 
-               <label>{key}</label>
-                <input type="text" value={filters[key]} onChange={(e) => setFilters(
-                  { ...filters, [key]: e.target.value }) } />
-                   </div> ))} <div className="filter-actions"> 
-                    <button className="clear-btn" onClick={() => setFilters(
-                      { name: "", company: "", region: "" }) } > Clear </button>
-                       <button className="apply-btn" onClick={() => { setShowFilter(false); setPage(1); }} > Apply </button> </div> </div> </> )}
+          <h3>Filter Leads</h3>
+          {["name", "company", "region"].map((key) => (
+            <div className="filter-group" key={key}>
+              <label>{key}</label>
+              <input type="text" value={filters[key]} onChange={(e) => setFilters(
+                { ...filters, [key]: e.target.value })} />
+            </div>))} <div className="filter-actions">
+            <button className="clear-btn" onClick={() => setFilters(
+              { name: "", company: "", region: "" })} > Clear </button>
+            <button className="apply-btn" onClick={() => { setShowFilter(false); setPage(1); }} > Apply </button> </div> </div> </>)}
     </section>
   );
 };

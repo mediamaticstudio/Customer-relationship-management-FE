@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../config.jsx";
 
 
-export default function ImportLeads({file, setFile}) {
+export default function ImportLeads({ file, setFile }) {
   const [loading, setLoading] = useState(false);
 
   const handleImport = async () => {
@@ -18,7 +19,7 @@ export default function ImportLeads({file, setFile}) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/configurations/leads/import-csv/",
+        `${API_BASE_URL}/configurations/leads/import-csv/`,
         {
           method: "POST",
           body: formData,
@@ -29,10 +30,10 @@ export default function ImportLeads({file, setFile}) {
 
 
       if (response.ok) {
-              toast.success(data.message); 
-            } else {
-              toast.error(data.message);
-            }
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
       console.error("Import error", error);
     } finally {
@@ -42,24 +43,24 @@ export default function ImportLeads({file, setFile}) {
 
   return (
     <div className="import-box">
-  <label className="file-input">
-    Choose CSV File
-    <input
-      type="file"
-      accept=".csv"
-      onChange={(e) => setFile(e.target.files[0])}
-      hidden
-    />
-  </label>
+      <label className="file-input">
+        Choose CSV File
+        <input
+          type="file"
+          accept=".csv"
+          onChange={(e) => setFile(e.target.files[0])}
+          hidden
+        />
+      </label>
 
-  <button
-    onClick={handleImport}
-    disabled={loading}
-    className="settings-btn import-btn"
-  >
-    {loading ? "Importing..." : "Import CSV"}
-  </button>
-</div>
+      <button
+        onClick={handleImport}
+        disabled={loading}
+        className="settings-btn import-btn"
+      >
+        {loading ? "Importing..." : "Import CSV"}
+      </button>
+    </div>
 
   );
 }

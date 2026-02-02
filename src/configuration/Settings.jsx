@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 import ImportLeads from "./ImportLeads";
 import ExportLeads from "./ExportLeads";
 import "../styles/Settings.css";
-import { 
-  FiUser, 
-  FiArrowLeft, 
-  FiUpload, 
+import {
+  FiUser,
+  FiArrowLeft,
+  FiUpload,
   FiDownload,
   FiUsers,
   FiChevronRight
@@ -17,7 +17,7 @@ import {
 export const Settings = () => {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
-  
+
 
   return (
     <div className="settings-wrapper">
@@ -27,10 +27,10 @@ export const Settings = () => {
           <FiArrowLeft className="back-icon" />
           <span>Back</span>
         </button>
-        <div className="header-content">
+        {/* <div className="header-content">
           <h1 className="settings-title">Settings</h1>
           <p className="settings-subtitle">Manage your leads and team members</p>
-        </div>
+        </div> */}
       </header>
 
       {/* Settings Cards Grid */}
@@ -43,14 +43,14 @@ export const Settings = () => {
               <FiUpload size={24} />
             </div> */}
             <label className="card-icon-wrapper import-icon">
-                 <FiUpload size={24} />
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => setFile(e.target.files[0])}
-              hidden
-            />
-          </label>
+              <FiUpload size={24} />
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setFile(e.target.files[0])}
+                hidden
+              />
+            </label>
 
             <div>
               <h3 className="card-title">Import Leads</h3>
@@ -92,12 +92,12 @@ export const Settings = () => {
             </div>
             <FiChevronRight className="chevron-icon" size={20} />
           </div>
-          
+
           <div className="user-card-content">
             <FiUser size={80} className="user-illustration" />
             <p className="user-card-text">Click to add new users or manage existing team members</p>
           </div>
-          
+
           <div className="card-footer">
             <span className="user-count">Manage roles and permissions</span>
           </div>

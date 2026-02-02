@@ -4,9 +4,10 @@ import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FiMenu, FiX, FiRotateCcw } from "react-icons/fi";
 import { Sidebar } from "../components/Sidebar";
+import { API_BASE_URL } from "../config.jsx";
 
 
-const API_URL = "http://127.0.0.1:8000/crm/get/lead/"; // change if needed
+const API_URL = `${API_BASE_URL}/crm/get/lead/`; // change if needed
 
 export const Leads = () => {
   const [lead, setLead] = useState(null);
@@ -18,9 +19,9 @@ export const Leads = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFromUrl = searchParams.get("status") || "assigned";
   const [selectedStatus, setSelectedStatus] = useState(statusFromUrl);
-   useEffect(() => {
-      setSearchParams({ status: selectedStatus });
-    }, [selectedStatus, setSearchParams]);
+  useEffect(() => {
+    setSearchParams({ status: selectedStatus });
+  }, [selectedStatus, setSearchParams]);
 
   // const token = localStorage.getItem("token"); 
 
@@ -32,7 +33,7 @@ export const Leads = () => {
     try {
       const res = await axios.get(API_URL, {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("access")}`,
+          Authorization: `Bearer ${localStorage.getItem("access")}`,
         },
       });
 
@@ -60,7 +61,7 @@ export const Leads = () => {
         {},
         {
           headers: {
-             Authorization: `Bearer ${localStorage.getItem("access")}`,
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
           },
         }
       );
@@ -72,7 +73,7 @@ export const Leads = () => {
         fetchLead(); // refresh lead data
       }
     } catch (error) {
-      toast.error("Unable to assign lead",error);
+      toast.error("Unable to assign lead", error);
     } finally {
       setLoading(false);
     }
@@ -84,47 +85,47 @@ export const Leads = () => {
 
   return (
     <section className="assigned-leads">
-          <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <FiX /> : <FiMenu />}
-          </button>
-          <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-            <Sidebar
-              selectedStatus={selectedStatus}
-              onStatusChange={setSelectedStatus}
-            />
-          </aside>
-    
-    <main className="main">
-      <div className="content">
-    <div>
-      {loading && <p>Loading...</p>}
+      <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>
+        {sidebarOpen ? <FiX /> : <FiMenu />}
+      </button>
+      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <Sidebar
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+        />
+      </aside>
 
-      {!loading && !lead && (
-        <p style={{ color: "gray" }}>No lead available</p>
-      )}
+      <main className="main">
+        <div className="content">
+          <div>
+            {loading && <p>Loading...</p>}
 
-      {lead && (
-        <div>
-         <div  onClick={() => navigate(`/leads/${lead.lead_id}`)}> 
-        <p><b>Name:</b> {lead.lead_name}</p>
-        <p><b>Company:</b> {lead.lead_company}</p>
-        <p><b>Region:</b> {lead.lead_region}</p>
+            {!loading && !lead && (
+              <p style={{ color: "gray" }}>No lead available</p>
+            )}
+
+            {lead && (
+              <div>
+                <div onClick={() => navigate(`/leads/${lead.lead_id}`)}>
+                  <p><b>Name:</b> {lead.lead_name}</p>
+                  <p><b>Company:</b> {lead.lead_company}</p>
+                  <p><b>Region:</b> {lead.lead_region}</p>
+                </div>
+                <button
+                  onClick={assignLead}
+                  disabled={loading}
+                >
+                  Get Lead
+                </button>
+              </div>
+
+            )}
+
+          </div>
         </div>
-        <button
-          onClick={assignLead}
-          disabled={loading}
-        >
-          Get Lead
-        </button>
-      </div>
-
-      )}
-
-    </div>
-    </div>
-    </main>
+      </main>
     </section>
-  
+
   );
 };
 

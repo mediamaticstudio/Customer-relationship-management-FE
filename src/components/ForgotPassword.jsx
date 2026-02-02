@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import "../styles/ForgotPassword.css";
+import { API_BASE_URL } from "../config.jsx";
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/auth/forgot-password/", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -32,7 +33,7 @@ export const ForgotPassword = () => {
       }
     } catch (err) {
       setError("Server error. Please try again later.");
-      toast.error("Server error. Please try again later.",err);
+      toast.error("Server error. Please try again later.", err);
     } finally {
       setLoading(false);
     }

@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa"; // Added FaSpinner for loading
 import { FiArrowRight, FiLock, FiMail } from "react-icons/fi";
 import Logo from "../assets/logo.png";
 import quotes from "../data/Quotes.json";
 import "../styles/Login.css";
+import { API_BASE_URL as GLOBAL_API_BASE_URL } from "../config.jsx";
 
 // Constants for better maintainability
-// Safety check for process.env to avoid ReferenceError in non-Node environments
-const API_BASE_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_BASE_URL) || "http://127.0.0.1:8000";
+const API_BASE_URL = GLOBAL_API_BASE_URL;
 const LOGIN_ENDPOINT = "/api/auth/login/";
-const SUCCESS_REDIRECT_PATH = "/assigned";
+const SUCCESS_REDIRECT_PATH = "/dashboard";
 const TOAST_DURATION = 800;
 
 /**
@@ -86,12 +86,15 @@ export const Login = () => {
         // Store tokens securely
         localStorage.setItem("access", data.access);
         localStorage.setItem("refresh", data.refresh);
-        localStorage.setItem("role", data.role);
+        localStorage.setItem("role", data.data.role);
+        localStorage.setItem("asc_code", data.data.asc_code);
+        localStorage.setItem("user_id", data.data.user_id);
+        localStorage.setItem("asc_location", data.data.asc_location);
         localStorage.setItem("email", trimmedEmail);
 
         toast.success("Welcome back!", {
           icon: "👋",
-        });
+        },);
 
         setTimeout(() => {
           navigate(SUCCESS_REDIRECT_PATH);
@@ -103,7 +106,7 @@ export const Login = () => {
       }
     } catch (error) {
       // Handle network or unexpected errors
-      toast.error("Network error. Please check your connection and try again.",error.message);
+      toast.error("Network error. Please check your connection and try again.", error.message);
       // In production, log to a service instead of console
     } finally {
       setLoading(false);
@@ -121,10 +124,10 @@ export const Login = () => {
               <img src={Logo} alt="Mediamatic Studio Logo" className="logo-img" />
             </div>
             <h2 className="company-name"><span>Mediamatic Studio</span>
-            <p className="company-tagline">Enterprise CRM Solution</p>
-             </h2>
+              <p className="company-tagline">Enterprise CRM Solution</p>
+            </h2>
           </div>
-           
+
           <div className="quote-container">
             {/* <div className="quote-icon" aria-hidden="true">❝</div> */}
             <h1 className="quote-title">{quote.title}</h1>
@@ -197,9 +200,9 @@ export const Login = () => {
             </div>
 
             <div className="form-options">
-              <a href="/forgot-password" className="forgot-link">
+              <Link to="/forgot-password" className="forgot-link">
                 Forgot Password?
-              </a>
+              </Link>
             </div>
 
             <button
@@ -218,9 +221,9 @@ export const Login = () => {
             <div className="form-footer">
               <p>
                 Need help?{" "}
-                <a href="/support" className="support-link">
+                <Link to="/support" className="support-link">
                   Contact Support
-                </a>
+                </Link>
               </p>
               <p className="copyright">© 2025 Mediamatic Studio CRM • v2.1.0</p>
             </div>

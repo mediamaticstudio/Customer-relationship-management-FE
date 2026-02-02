@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/LeadTracking.css";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../config.jsx";
 
 
 const LeadTracking = () => {
@@ -18,7 +19,7 @@ const LeadTracking = () => {
   const fetchTracking = async () => {
     try {
       const res = await axios.get(
-        `http://127.0.0.1:8000/crm/leads/${id}/tracking/`,
+        `${API_BASE_URL}/crm/leads/${id}/tracking/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access")}`,
@@ -58,12 +59,12 @@ const LeadTracking = () => {
         <tbody>
           {tracking.map((item, index) => (
             <tr key={`${item.status}-${index}`}>
-              <td>{item.label}</td>
-              <td>{item.date || "-"}</td>
-              <td>{item.remarks || "-"}</td>
+              <td data-label="Status">{item.label}</td>
+              <td data-label="Date">{item.date || "-"}</td>
+              <td data-label="Remarks">{item.remarks || "-"}</td>
             </tr>
           ))}
-</tbody>
+        </tbody>
 
       </table>
     </section>

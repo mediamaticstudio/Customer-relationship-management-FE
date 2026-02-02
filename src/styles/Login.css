@@ -1,18 +1,21 @@
 /* Login Page */
 .login-page {
   display: flex;
-  min-height: 97.5vh;
-  background: var(--cream-bg);
+  min-height: 100vh;
+  /* background: var(--cream-bg); */
 }
 
 /* Brand Panel */
 .brand-panel {
-  flex: 1;
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-mid) 100%);
+  flex: 1.2;
+  background: linear-gradient(135deg, var(--sidebar-bg-1) 0%, var(--sidebar-bg-2) 100%);
   color: var(--text-light);
-  padding: 60px 40px;
+  padding: 80px 60px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .brand-panel::before {
@@ -22,87 +25,108 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  z-index: 1;
 }
 
 .brand-content {
   position: relative;
   z-index: 2;
-  max-width: 600px;
+  max-width: 500px;
   margin: 0 auto;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 60px;
 }
 
-.logo-container {
-  display: flex; /* Changed to flex for horizontal alignment */
-  align-items: center; /* Align logo and text vertically */
-  justify-content: center; /* Center the entire container */
-  gap: 20px; /* Space between logo and text */
-  margin-bottom: 10px; /* Reduced from 60px to tighten space above quotes */
-}
-
-/* .logo-glow {
-  display: inline-block;
-  padding: 20px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  animation: pulse 3s infinite;
-} */
-
-.logo-img {
-  width: 180px; /* Increased from 120px for better readability */
-  height: 130px; /* Increased from 120px for better readability */
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-}
-
-.company-name {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin: 0; /* Removed bottom margin since it's now inline */
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg,var(--text-light) 0%, var(--accent-gold-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.company-name span {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  color: var(--text-light);
+  white-space: nowrap;
+  animation: slideRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .company-tagline {
   font-size: 1rem;
-  margin: 0;
-  /* display: none; Hidden to keep only logo and name on one line; remove if you want tagline back */
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  opacity: 0;
+  animation: slideRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
 }
 
 .quote-container {
-  /* flex: 1; */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 50px 30px;
-   /* Reduced from 40px to tighten space between quotes and above section */
-}
-
-.quote-icon {
-  font-size: 3rem;
-  color: rgba(255, 255, 255, 0.2);
-  margin-bottom: 20px;
+  gap: 20px;
+  border-left: 4px solid var(--primary-light);
+  padding-left: 30px;
+  opacity: 0;
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
 }
 
 .quote-title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin: 0 0 16px 0;
-  line-height: 1.3;
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .quote-content {
   font-size: 1.1rem;
-  line-height: 1.6;
-  color: var(--text-muted);
-  margin: 0;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  opacity: 0;
+  animation: slideRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.logo-img {
+  width: 140px;
+  height: auto;
+  transition: transform var(--transition-normal);
+}
+
+.logo-container:hover .logo-img {
+  transform: scale(1.05);
+}
+
+.company-name {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .brand-footer {
@@ -115,6 +139,7 @@
   color: var(--text-muted);
   margin: 0 0 10px 0;
 }
+
 .brand-footer {
   position: relative;
   margin-top: auto;
@@ -143,6 +168,18 @@
   justify-content: center;
   padding: 40px;
   background: var(--cream-bg);
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.4s forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .form-container {
@@ -321,12 +358,14 @@
 .support-link:hover {
   text-decoration: underline;
 }
-.error-message{
+
+.error-message {
   color: var(--error-red);
   font-size: 0.9rem;
   margin-top: -16px;
   margin-bottom: 16px;
 }
+
 .copyright {
   font-size: 0.85rem;
   color: rgba(91, 29, 38, 0.6);
@@ -337,27 +376,29 @@
   .login-page {
     flex-direction: column;
   }
-  
+
   .brand-panel {
     padding: 40px 20px;
   }
-  
+
   .form-panel {
     padding: 20px;
   }
-  
+
   .stats-container {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .logo-container {
-    flex-direction: column; /* Stack vertically on smaller screens */
+    flex-direction: column;
+    /* Stack vertically on smaller screens */
     gap: 10px;
   }
-  
+
   .logo-img {
-    width: 120px; /* Reduce size on mobile for better fit */
+    width: 120px;
+    /* Reduce size on mobile for better fit */
     height: 120px;
   }
 }
@@ -366,21 +407,27 @@
   .login-form {
     padding: 30px 20px;
   }
-  
+
   .form-header h2 {
-    font-size: 1.75rem;
+    font-size: 1.9rem;
   }
-  
+
   .quote-title {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
+    font-weight: 800;
   }
-  
-  .company-name {
-    font-size: 1.8rem;
+
+  .company-name span {
+    font-size: 2.2rem;
   }
-  
+
+  .input-group label {
+    font-size: 1.05rem;
+  }
+
   .logo-img {
-    width: 100px; /* Further reduce on very small screens */
+    width: 100px;
+    /* Further reduce on very small screens */
     height: 100px;
   }
 }

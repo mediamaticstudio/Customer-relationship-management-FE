@@ -38,7 +38,7 @@ const chartDataMap = {
     data: [45, 52, 39, 60],
   },
   monthly: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun" ,"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     data: [120, 98, 135, 160, 145, 170, 20, 80, 120, 160, 200, 60],
   },
 };
@@ -82,26 +82,45 @@ export default function BarChart() {
   };
 
   return (
-    <div style={{ width: "100%" }}>
-      {/* Dropdown */}
-      <select
-        value={view}
-        onChange={(e) => setView(e.target.value)}
-        style={{
-          marginBottom: "16px",
-          padding: "8px 12px",
-          borderRadius: "8px",
-          background: "var(--input-bg)",
-          color: "var(--text-dark)",
-          border: "1px solid var(--border-soft)",
-        }}
-      >
-        <option value="daily">Daily Leads</option>
-        <option value="weekly">Weekly Leads</option>
-        <option value="monthly">Monthly Leads</option>
-      </select>
+    <div style={{ width: "100%", height: "100%", display: 'flex', flexDirection: 'column' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '32px'
+      }}>
+        <div>
+          <h3 style={{ fontSize: '1.4rem', color: 'var(--primary-dark)', margin: 0 }}>Performance Overview</h3>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-dark)', opacity: 0.6, margin: '4px 0 0 0' }}>
+            Tracking {view} lead generation trends
+          </p>
+        </div>
 
-      <Bar data={chartData} options={options} />
+        <select
+          value={view}
+          onChange={(e) => setView(e.target.value)}
+          style={{
+            padding: "10px 16px",
+            borderRadius: "12px",
+            background: "var(--card-bg)",
+            color: "var(--text-dark)",
+            border: "2px solid var(--border-soft)",
+            fontWeight: "600",
+            cursor: "pointer",
+            outline: "none",
+            boxShadow: "var(--shadow-soft)",
+            transition: "all 0.3s ease"
+          }}
+        >
+          <option value="daily">Daily View</option>
+          <option value="weekly">Weekly View</option>
+          <option value="monthly">Monthly View</option>
+        </select>
+      </div>
+
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <Bar data={chartData} options={{ ...options, maintainAspectRatio: false }} />
+      </div>
     </div>
   );
 }

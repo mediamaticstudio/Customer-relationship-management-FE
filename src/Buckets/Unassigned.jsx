@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/Buckets.css";
+import { API_BASE_URL } from "../config.jsx";
 
 export const BulkAssign = ({ leadIds, onSuccess }) => {
   const [agents, setAgents] = useState([]);
@@ -8,7 +9,7 @@ export const BulkAssign = ({ leadIds, onSuccess }) => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/auth/userlist/", {
+      .get(`${API_BASE_URL}/api/auth/userlist/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("access")}` },
       })
       .then((res) => setAgents(res.data.data || []));
@@ -20,7 +21,7 @@ export const BulkAssign = ({ leadIds, onSuccess }) => {
     setAssigning(true);
     try {
       await axios.post(
-        "http://127.0.0.1:8000/crm/leads/",
+        `${API_BASE_URL}/crm/leads/`,
         {
           lead_ids: leadIds, // ✅ ARRAY
           agent_id: agentId,

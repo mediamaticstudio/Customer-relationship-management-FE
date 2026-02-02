@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config.jsx";
 
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000",
+  baseURL: API_BASE_URL,
 });
 
 axiosInstance.interceptors.request.use(
@@ -28,7 +29,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "http://127.0.0.1:8000/api/token/refresh/",
+          `${API_BASE_URL}/api/token/refresh/`,
           {
             refresh: localStorage.getItem("refresh"),
           }
