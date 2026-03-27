@@ -1,0 +1,202 @@
+.not-found-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--cream-bg);
+    color: var(--text-dark);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    transition: background-color var(--transition-normal);
+}
+
+.not-found-content {
+    max-width: 600px;
+    width: 100%;
+    background: var(--card-bg);
+    padding: 60px 40px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-soft);
+    position: relative;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    animation: slideUpFade 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.error-icon-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.error-icon {
+    font-size: 80px;
+    color: var(--primary-dark);
+    margin-bottom: -15px;
+    animation: float 4s ease-in-out infinite;
+}
+
+.error-code {
+    font-size: 100px;
+    font-weight: 900;
+    letter-spacing: -5px;
+    color: var(--primary-dark);
+    opacity: 0.1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    user-select: none;
+}
+
+.not-found-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: var(--primary-dark);
+    letter-spacing: -0.5px;
+}
+
+.not-found-text {
+    font-size: 1.1rem;
+    color: var(--text-muted-dark);
+    margin-bottom: 40px;
+    line-height: 1.7;
+}
+
+.not-found-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.home-btn {
+    background: var(--btn-bg);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(107, 31, 43, 0.2);
+}
+
+/* Light Mode Overrides for Home Button text on hover */
+[data-theme='light'] .home-btn {
+    color: #fff3c4;
+}
+
+.home-btn:hover {
+    background: var(--btn-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(107, 31, 43, 0.3);
+}
+
+/* Fix for Dark Mode button text - ensures it remains visible */
+[data-theme='dark'] .home-btn {
+    color: var(--sidebar-bg-1);
+    /* Deep maroon on cream/gold back */
+}
+
+.go-back-link {
+    background: transparent;
+    border: none;
+    color: var(--primary-dark);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.go-back-link:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    text-decoration: underline;
+}
+
+/* Floating Decorative Blobs */
+.bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    opacity: 0.15;
+}
+
+.blob-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--primary-dark);
+    top: -100px;
+    right: -100px;
+    animation: morph 20s ease-in-out infinite alternate;
+}
+
+.blob-2 {
+    width: 350px;
+    height: 350px;
+    background: var(--primary-light);
+    bottom: -80px;
+    left: -50px;
+    animation: morph 15s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes morph {
+    0% {
+        border-radius: 40% 60% 60% 40% / 40% 30% 70% 60%;
+    }
+
+    100% {
+        border-radius: 60% 40% 40% 60% / 60% 70% 30% 40%;
+    }
+}
+
+@media (max-width: 768px) {
+    .not-found-content {
+        padding: 40px 25px;
+    }
+
+    .not-found-title {
+        font-size: 1.8rem;
+    }
+
+    .error-code {
+        font-size: 70px;
+    }
+}

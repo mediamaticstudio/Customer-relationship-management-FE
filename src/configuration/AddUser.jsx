@@ -10,7 +10,6 @@ import Dashboard from "../components/Dashboard.jsx";
 
 const API = `${API_BASE_URL}/configurations/users/`;
 const ROLE_OPTIONS = [
-  { value: "SUPERADMIN", label: "Superadmin" },
   { value: "ADMIN", label: "Admin" },
   { value: "SUPERVISOR", label: "Supervisor" },
   { value: "AGENT", label: "Agent" },
@@ -59,7 +58,7 @@ export default function AddUser() {
   // ================= FETCH USERS =================
   const fetchUsers = async (page = 1) => {
     try {
-      const res = await axios.get(`${API}?page=${page}&page_size=5`);
+      const res = await axios.get(`${API}?page=${page}&page_size=5&logged_in_role=${LOGGED_IN_ROLE}`);
       setUsers(res.data.data || []);
       setCount(res.data.count);
       setCurrentPage(res.data.current_page);
@@ -330,7 +329,6 @@ export default function AddUser() {
 
             {IS_SUPERADMIN && (
               <>
-                <option value="SUPERADMIN">Superadmin</option>
                 <option value="ADMIN">Admin</option>
               </>
             )}

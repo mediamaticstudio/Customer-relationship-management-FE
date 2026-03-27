@@ -11,6 +11,15 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add Dynamic Database Selection Header
+    const selectedDb = localStorage.getItem("selected_db") || "default";
+    config.headers['X-DB-Name'] = selectedDb;
+
+    // Cache buster for GET requests
+    if (config.method === 'get') {
+      config.params = { ...config.params, _t: new Date().getTime() };
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -29,7 +38,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          `${API_BASE_URL}/api/token/refresh/`,
+          `${API_BASE_URL}/token/refresh/`,
           {
             refresh: localStorage.getItem("refresh"),
           }
@@ -42,7 +51,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (err) {
         localStorage.clear();
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     }
 

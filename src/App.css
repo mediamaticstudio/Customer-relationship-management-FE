@@ -6,66 +6,69 @@
   /* Default Light Theme */
   --cream-bg: #fff3c4;
   --card-bg: #fff8de;
-  --text-dark: #5b1d26;
-  --text-muted-dark: rgba(91, 29, 38, 0.6);
-  --input-bg: #fff6df;
-  --border-soft: rgba(91, 29, 38, 0.15);
+  --text-dark: #2d0e12;
+  /* Darker for better contrast */
+  --text-muted-dark: rgba(91, 29, 38, 0.85);
+  /* Significantly increased contrast */
+  --input-bg: #fffbf0;
+  /* Lighter input bg for clarity */
+  --border-soft: rgba(91, 29, 38, 0.2);
 
   --text-light: #f9e7d3;
-  --text-muted: rgba(255, 255, 255, 0.75);
+  --text-muted: rgba(255, 255, 255, 0.9);
   --white: #ffffff;
 
   --btn-bg: #5b0f1b;
   --btn-hover: #731826;
 
-  --shadow-soft: 0 10px 30px rgba(91, 29, 38, 0.1);
-  --shadow-medium: 0 20px 40px rgba(91, 29, 38, 0.15);
-  --error-red: #dd6767;
+  --shadow-soft: 0 10px 30px rgba(91, 29, 38, 0.08);
+  --shadow-medium: 0 20px 40px rgba(91, 29, 38, 0.12);
+  --error-red: #d32f2f;
+  /* Standard accessible red */
   --success-green: #15803d;
-  /* Darker green for light theme text */
 
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
 
-  /* Layout Backgrounds (Sidebar, Login Panel) */
-  --sidebar-bg-1: #6b1f2b;
+  /* Layout Backgrounds */
+  --sidebar-bg-1: #4d191d;
   --sidebar-bg-2: #7a2530;
-  --sidebar-text: #f9e7d3;
-  /* Light text for Maroon sidebar */
+  --sidebar-text: #fff3c4;
   --sidebar-logo-filter: brightness(0) invert(1);
-  /* Ensure logo is visible on dark maroon */
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
   /* "Midnight Maroon" - Deep, rich maroon background for a premium feel */
-  --cream-bg: #1e0a0d;
+  --cream-bg: #1a0508;
+  /* Darker absolute bg */
   --card-bg: #2d1015;
   --white: #2d1015;
-  --text-dark: #fff3c4;
-  --text-muted-dark: rgba(255, 243, 196, 0.7);
-  --input-bg: #140709;
-  --border-soft: rgba(255, 243, 196, 0.12);
+  --text-dark: #fff9e6;
+  /* Brighter cream for text */
+  --text-muted-dark: rgba(255, 243, 196, 0.85);
+  /* High contrast muted text */
+  --input-bg: #0f0204;
+  --border-soft: rgba(255, 243, 196, 0.2);
 
-  /* Sidebar: Deep Maroon for brand consistency */
+  /* Sidebar */
   --sidebar-bg-1: #3d0f15;
   --sidebar-bg-2: #2d1015;
   --sidebar-text: #fff3c4;
   --sidebar-logo-filter: brightness(0) invert(1);
 
-  /* Accents & Buttons */
-  --primary-dark: #b67b45;
-  /* Richer Gold */
-  --primary-mid: #f9e7d3;
+  /* Accents */
+  --primary-dark: #eecfa1;
+  /* High-contrast Gold/Cream for dark mode primary */
+  --primary-mid: #d4a76a;
   --primary-light: #fff3c4;
 
   --btn-bg: #fff3c4;
-  /* Cream buttons for pop */
   --btn-hover: #f9e7d3;
   --success-green: #4ade80;
 
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --shadow-medium: 0 20px 40px rgba(0, 0, 0, 0.6);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-medium: 0 20px 40px rgba(0, 0, 0, 0.7);
 }
 
 /* Fix for Native Calendar Icons in Dark Mode */
@@ -87,31 +90,28 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
+  width: 100%;
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: light;
-  /* Default light scheme */
 }
 
-/* Custom Scrollbar */
+/* MODERN ALTERNATIVE: Seamless Hidden Scrolling (Premium SaaS Feel) */
+* {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important;    /* Firefox */
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  display: none !important;            /* Chrome, Safari, Opera, Edge */
 }
 
-::-webkit-scrollbar-track {
-  background: var(--cream-bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary-light);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-mid);
+*::-webkit-scrollbar {
+  display: none !important;
 }
 
 ::selection {
@@ -200,5 +200,41 @@ html {
 @media (max-width: 480px) {
   body {
     font-size: 14px;
+  }
+}
+
+/* Global Hamburger Menu */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 2005;
+  background: var(--primary-dark);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-medium);
+  transition: all var(--transition-normal);
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger:hover {
+  background: var(--primary-mid);
+  transform: scale(1.05);
+}
+
+.hamburger svg {
+  font-size: 24px;
+}
+
+@media (max-width: 1024px) {
+  .hamburger {
+    display: flex;
   }
 }

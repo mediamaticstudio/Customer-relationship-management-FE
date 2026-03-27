@@ -68,6 +68,8 @@ export const Leads = () => {
 
       if (res.data.already_assigned) {
         toast.warning(res.data.message || "You already have a lead");
+      } else if (res.data.status === "Fail") {
+        toast.warning(res.data.message || "Limit reached");
       } else {
         toast.success(res.data.message || "Lead assigned successfully");
         fetchLead(); // refresh lead data
@@ -109,7 +111,7 @@ export const Leads = () => {
                 <div onClick={() => navigate(`/leads/${lead.lead_id}`)}>
                   <p><b>Name:</b> {lead.lead_name}</p>
                   <p><b>Company:</b> {lead.lead_company}</p>
-                  <p><b>Region:</b> {lead.lead_region}</p>
+                  <p><b>Designation:</b> {lead.lead_designation}</p>
                 </div>
                 <button
                   onClick={assignLead}

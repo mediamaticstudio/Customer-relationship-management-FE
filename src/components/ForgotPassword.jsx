@@ -14,9 +14,12 @@ export const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password/`, {
+      const res = await fetch(`${API_BASE_URL}/auth/forgot-password/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-DB-Name": localStorage.getItem("selected_db") || "default"
+        },
         body: JSON.stringify({ email }),
       });
 

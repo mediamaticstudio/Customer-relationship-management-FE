@@ -11,7 +11,10 @@ const LeadTracking = () => {
   const navigate = useNavigate();
   const [tracking, setTracking] = useState([]);
   const [loading, setLoading] = useState(true);
-
+const formatDate = (iso) => {
+  if (!iso) return "-";
+  return new Date(iso).toLocaleString();
+};
   useEffect(() => {
     fetchTracking();
   }, [id]);
@@ -28,7 +31,7 @@ const LeadTracking = () => {
       );
 
       setTracking(res.data.tracking || []);
-      console.log(res.data.tracking)
+     
     } catch (err) {
       navigate(-1);
       toast.error(err.message)
@@ -60,7 +63,7 @@ const LeadTracking = () => {
           {tracking.map((item, index) => (
             <tr key={`${item.status}-${index}`}>
               <td data-label="Status">{item.label}</td>
-              <td data-label="Date">{item.date || "-"}</td>
+              <td data-label="Date">{formatDate(item.date ) || '-'}</td>
               <td data-label="Remarks">{item.remarks || "-"}</td>
             </tr>
           ))}

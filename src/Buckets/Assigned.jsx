@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Sidebar } from "../components/Sidebar";
+import { Navbar } from "../components/Navbar";
 import "../styles/Assigned.css";
 import axios from "axios";
-import { FiMenu, FiX, FiRotateCcw } from "react-icons/fi";
+import { FiMenu, FiX, FiRotateCcw, FiDownloadCloud, FiUserPlus, FiSearch } from "react-icons/fi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AgentList } from "./AgentList";
 import { toast } from "react-toastify";
@@ -12,25 +13,72 @@ import { API_BASE_URL } from "../config.jsx";
 const API = `${API_BASE_URL}/crm/leads/`;
 const API_URL = `${API_BASE_URL}/crm/get/lead/`; // change if needed
 
+const BUCKET_NAMES = {
+  "assigned": "Assigned",
+  "second-attempt": "Second Attempt",
+  "third-attempt": "Third Attempt",
+  "followup": "Follow Up",
+  "prospect": "Prospect",
+  "completed": "Completed",
+  "re-research": "Re-Research",
+  "deal-won": "Sale Won",
+  "sale-won": "Sale Won",
+  "sale-lost": "Sale Lost",
+  "invalid": "Invalid",
+  "dnd": "DND",
+  "unassigned": "Unassigned"
+};
+
+const STATUS_OPTIONS = [
+  { value: "email-request", label: "Email Request" },
+  { value: "not-interested", label: "Not Interested" },
+  { value: "callback", label: "Call Back" },
+  { value: "interested", label: "Interested" },
+  { value: "language-barrier", label: "Language Barrier" },
+  { value: "hung-up", label: "Hung Up" },
+  { value: "followup", label: "Follow Up" },
+  { value: "Callback-Voicemail", label: "Callback - Voicemail" },
+  { value: "wrong-number", label: "Wrong Number" },
+  { value: "converted", label: "Sale Won" },
+  { value: "fax-tone", label: "Fax Tone" },
+  { value: "direct-voicemail", label: "Direct Voice mail" },
+  { value: "general-voicemail", label: "General Voicemail" },
+  { value: "not-in-service", label: "Not In Service" },
+  { value: "disconnected", label: "Disconnected Number" },
+  { value: "receptionist", label: "Receptionist / Operator" },
+  { value: "unanswered", label: "Unanswered" },
+  { value: "call-failed", label: "Call Cannot Be Completed" },
+  { value: "spam-blocked", label: "Call Blocked as Spam" },
+  { value: "not-accepting", label: "Not Accepting Call" },
+  { value: "dnd", label: "Do Not Call (DND)" },
+  { value: "duplicate", label: "Duplicate" },
+  { value: "invalid", label: "Invalid Number" },
+];
+
+
 
 export const Assigned = () => {
   const user_role = localStorage.getItem("role");
-  console.log(user_role)
+
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedLanguage, setSelectedLanguage] = useState("General");
 
   /* ================= STATUS FROM URL ================= */
   const statusFromUrl = searchParams.get("status") || "assigned";
+  const searchFromUrl = searchParams.get("search") || "";
+  const isGlobalFromUrl = searchParams.get("global") === "true";
   const [selectedStatus, setSelectedStatus] = useState(statusFromUrl);
 
   /* ================= STATE ================= */
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchFromUrl);
+  const [isGlobal, setIsGlobal] = useState(isGlobalFromUrl);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get("page") || 1));
   const [pageSize, setPageSize] = useState(10); //  USER CONTROLLED
   const [totalCount, setTotalCount] = useState(0);
 
@@ -42,20 +90,44 @@ export const Assigned = () => {
   const [filters, setFilters] = useState({
     name: "",
     company: "",
-    region: "",
+    designation: "",
+    phone_status: "",
   });
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
   /* ================= SYNC URL → STATE ================= */
   useEffect(() => {
     setSelectedStatus(statusFromUrl);
-    setPage(1);
+    setSearch(searchFromUrl);
+    setIsGlobal(isGlobalFromUrl);
+    setPage(Number(searchParams.get("page") || 1));
     setSelectedLeads([]);
-  }, [statusFromUrl]);
+  }, [statusFromUrl, searchFromUrl, isGlobalFromUrl, searchParams]);
 
   /* ================= SYNC STATE → URL ================= */
   useEffect(() => {
-    setSearchParams({ status: selectedStatus });
-  }, [selectedStatus, setSearchParams]);
+    const params = new URLSearchParams();
+    if (selectedStatus) params.set("status", selectedStatus);
+    if (search) {
+      params.set("search", search);
+      if (isGlobal) params.set("global", "true");
+    }
+    if (page > 1) params.set("page", page.toString());
+    setSearchParams(params);
+  }, [selectedStatus, search, isGlobal, page, setSearchParams]);
+
 
   /* ================= FETCH LEADS ================= */
 
@@ -126,9 +198,11 @@ export const Assigned = () => {
           page,
           page_size: pageSize,
           search,
+          global: isGlobal ? "true" : "false",
           name: filters.name,
           company: filters.company,
-          region: filters.region,
+          designation: filters.designation,
+          phone_status: filters.phone_status,
           today,
         },
         headers: {
@@ -138,6 +212,14 @@ export const Assigned = () => {
 
       setLeads(res.data?.data || []);
       setTotalCount(res.data?.count || 0);
+
+      // --- AUTO-SWITCH BUCKET IF GLOBAL SEARCH FINDS SOMETHING ELSE ---
+      if (isGlobal && res.data?.data?.length > 0) {
+        const firstLeadStatus = res.data.data[0].status;
+        if (firstLeadStatus && firstLeadStatus !== selectedStatus) {
+          setSelectedStatus(firstLeadStatus);
+        }
+      }
     } catch (error) {
       if (error.response?.status === 401) {
         localStorage.clear();
@@ -158,9 +240,11 @@ export const Assigned = () => {
     page,
     pageSize,
     search,
+    isGlobal,
     filters.name,
     filters.company,
-    filters.region,
+    filters.designation,
+    filters.phone_status,
     today,
     navigate,
   ]);
@@ -174,7 +258,7 @@ export const Assigned = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       const res = await axios.get(
-        `${API_BASE_URL}/api/auth/userlist/`,
+        `${API_BASE_URL}/auth/userlist/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access")}`,
@@ -192,7 +276,8 @@ export const Assigned = () => {
   /* ================= RESET ================= */
   const handleReset = () => {
     setSearch("");
-    setFilters({ name: "", company: "", region: "" });
+    setIsGlobal(false);
+    setFilters({ name: "", company: "", designation: "", phone_status: "" });
     setPage(1);
   };
 
@@ -255,7 +340,7 @@ export const Assigned = () => {
     try {
       const res = await axios.post(
         API_URL,
-        {},
+        { language: selectedLanguage },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access")}`,
@@ -265,6 +350,8 @@ export const Assigned = () => {
 
       if (res.data.already_assigned) {
         toast.warning(res.data.message || "You already have a lead");
+      } else if (res.data.status === "Fail") {
+        toast.warning(res.data.message || "Limit reached");
       } else {
         setPage(1);
         toast.success(res.data.message || "Lead assigned successfully");
@@ -293,34 +380,233 @@ export const Assigned = () => {
       </aside>
 
       <main className="main">
+        <Navbar pageTitle={`Welcome, ${localStorage.getItem("userName") || "User"}`} subTitle={`Managing Your ${BUCKET_NAMES[selectedStatus] || "Assigned"} Leads`} />
         <div className="content">
-          {user_role === "AGENT" && selectedStatus === "assigned" && <div className="assigned-dashboard-center"> <UserDashBoard setToday={setToday} />
-          </div>}
-          {user_role == "AGENT" && <div className="lead-btn"><button
-            className="back-btn" onClick={() => {
-              assignLead()
-              navigate("/assigned?status=assigned")
-            }}
-            disabled={loading}
-          >
-            Get Lead
-          </button>
-          <button
-            className="back-btn" onClick={() => {
-             
-              navigate("/create")
-            }}
-            disabled={loading}
-          >
-            Add Lead
-          </button> </div>
-          }
+          {user_role === "AGENT" && selectedStatus === "assigned" && (
+            <div className="assigned-dashboard-center" style={{ padding: "0 32px" }}>
+              <UserDashBoard 
+                setToday={setToday} 
+                actionButtons={
+                  <>
+                    <select
+                      value={selectedLanguage}
+                      onChange={(e) => setSelectedLanguage(e.target.value)}
+                      style={{
+                        background: "#fdf8f0", color: "#4A151E", border: "1.5px solid #4A151E", 
+                        borderRadius: "8px", padding: "0 14px", height: "42px", fontSize: "0.85rem", fontWeight: "600",
+                        outline: "none", cursor: "pointer"
+                      }}
+                    >
+                      <option value="General">General</option>
+                      <option value="Tamil">Tamil</option>
+                      <option value="Malayalam">Malayalam</option>
+                      <option value="Kannada">Kannada</option>
+                      <option value="Telugu">Telugu</option>
+                      <option value="Hindi">Hindi</option>
+                      <option value="English">English</option>
+                    </select>
+                    <button
+                      className="back-btn" onClick={() => {
+                        assignLead()
+                        navigate("/assigned?status=assigned")
+                      }}
+                      disabled={loading}
+                      style={{
+                        background: "#fdf8f0", color: "#4A151E", border: "1.5px solid #4A151E", 
+                        borderRadius: "8px", padding: "0 20px", height: "42px", display: "flex", alignItems: "center", gap: "8px",
+                        fontWeight: "800", cursor: "pointer", fontSize: "0.85rem", transition: "all 0.2s"
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "#f4ebd8"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "#fdf8f0"; }}
+                    >
+                      <FiDownloadCloud size={16} /> Get Lead
+                    </button>
+                    <button
+                      className="back-btn" onClick={() => { navigate("/create") }}
+                      disabled={loading}
+                      style={{
+                        background: "#4A151E", color: "#fff", border: "none", 
+                        borderRadius: "8px", padding: "0 20px", height: "42px", display: "flex", alignItems: "center", gap: "8px",
+                        fontWeight: "800", cursor: "pointer", fontSize: "0.85rem", transition: "all 0.2s",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "#651d28"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "#4A151E"; }}
+                    >
+                      <FiUserPlus size={16} /> Add Lead
+                    </button>
+                  </>
+                }
+              />
+            </div>
+          )}
+          
+          <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid #efe8d8", margin: "0 32px 32px 32px", display: "flex", flexDirection: "column", minHeight: "50vh", boxShadow: "0 4px 12px rgba(0,0,0,0.02)", overflow: "hidden" }}>
           {/* Header */}
-          {user_role != "AGENT" && <div className="table-header"> <div className="search-bar"> <input type="text" placeholder="Search by name, company or region..." className="search-input" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} /> <button className="clear-button" onClick={() => setSearch("")}> <FiX size={18} /> </button> </div> <div className="filter"> <button onClick={() => setShowFilter(true)} className="search-filter" > Filter </button> <button onClick={handleReset} className="reset-button"> <FiRotateCcw size={18} /> </button> </div> </div>}
+          {user_role !== "AGENT" ? (
+            <div className="table-header" style={{ padding: "32px 32px 12px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #f5f0e8" }}>
+              <div style={{
+                display: "flex", alignItems: "center",
+                background: "#fcfbfa", border: "1px solid #e8e3dc",
+                borderRadius: "8px", padding: "0 16px",
+                height: "44px", gap: "12px",
+                flex: "2",
+                transition: "border-color 0.2s"
+              }}>
+                <FiSearch size={16} color="#888" style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  placeholder="Search by name, company or designation..."
+                  value={search}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearch(val);
+                    setPage(1);
+                    if (val) setIsGlobal(true);
+                  }}
+                  style={{
+                    border: "none", outline: "none", background: "transparent",
+                    fontSize: "0.85rem", color: "#333", width: "100%", fontWeight: "500"
+                  }}
+                />
+                {search && (
+                  <button
+                    onClick={() => { setSearch(""); setIsGlobal(false); }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#bbb", flexShrink: 0 }}
+                  >
+                    <FiX size={14} />
+                  </button>
+                )}
+              </div>
+              <div style={{ display: "flex", gap: "12px", height: "44px" }}>
+                <button 
+                  onClick={() => setShowFilter(true)} 
+                  style={{ 
+                    background: "#4A151E", color: "#fff", border: "none", 
+                    borderRadius: "8px", padding: "0 24px", fontSize: "0.85rem", fontWeight: "700",
+                    cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#651d28"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#4A151E"; }}
+                >
+                  Filter
+                </button>
+                <button 
+                  onClick={handleReset} 
+                  style={{ 
+                    background: "#fcfbfa", color: "#4A151E", border: "1px solid #e8e3dc", 
+                    borderRadius: "8px", padding: "0 14px", display: "flex", alignItems: "center", 
+                    cursor: "pointer", transition: "all 0.2s" 
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#f4f0e8"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#fcfbfa"; }}
+                >
+                  <FiRotateCcw size={18} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="agent-status-filter" style={{ padding: "32px 32px 12px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #f5f0e8" }}>
+              <div style={{
+                display: "flex", alignItems: "center",
+                background: "#fcfbfa", border: "1px solid #e8e3dc",
+                borderRadius: "8px", padding: "0 16px",
+                height: "44px", gap: "12px",
+                flex: "2",
+                transition: "border-color 0.2s"
+              }}>
+                <FiSearch size={16} color="#888" style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  placeholder="Search by name, company or designation..."
+                  value={search}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearch(val);
+                    setPage(1);
+                    if (val) setIsGlobal(true);
+                  }}
+                  style={{
+                    border: "none", outline: "none", background: "transparent",
+                    fontSize: "0.85rem", color: "#333", width: "100%", fontWeight: "500"
+                  }}
+                />
+                {search && (
+                  <button
+                    onClick={() => { setSearch(""); setIsGlobal(false); }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#bbb", flexShrink: 0 }}
+                  >
+                    <FiX size={14} />
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={filters.phone_status}
+                onChange={(e) => { setFilters({ ...filters, phone_status: e.target.value }); setPage(1); }}
+                style={{
+                  padding: "0 16px",
+                  borderRadius: "8px",
+                  border: "1px solid #e8e3dc",
+                  background: "#fcfbfa",
+                  color: "#555",
+                  fontSize: "0.85rem",
+                  fontWeight: "600",
+                  outline: "none",
+                  cursor: "pointer",
+                  height: "44px",
+                  flex: "1",
+                  appearance: "none",
+                  backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 16px center",
+                  backgroundSize: "16px",
+                  transition: "border-color 0.2s"
+                }}
+              >
+                <option value="">Filter by Phone Status</option>
+                {(() => {
+                  const bucketMap = {
+                    "assigned": ["callback", "interested", "followup", "direct-voicemail", "general-voicemail", "email-request", "language-barrier"],
+                    "second-attempt": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
+                    "third-attempt": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
+                    "followup": ["followup", "callback", "interested", "Callback-Voicemail", "email-request", "language-barrier"],
+                    "prospect": ["interested"],
+                    "completed": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
+                    "re-research": ["wrong-number", "not-in-service", "disconnected", "fax-tone", "invalid"],
+                    "deal-won": ["converted"],
+                    "sale-lost": ["not-interested"],
+                    "invalid": ["invalid", "duplicate", "fax-tone"],
+                    "dnd": ["dnd"]
+                  };
+                  const allowed = bucketMap[selectedStatus] || [];
+                  const filtered = allowed.length > 0
+                    ? STATUS_OPTIONS.filter(opt => allowed.includes(opt.value))
+                    : STATUS_OPTIONS;
+
+                  return filtered.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ));
+                })()}
+                <option value="other">Other Statuses...</option>
+              </select>
+              {filters.phone_status && (
+                <button
+                  onClick={() => { setFilters({ ...filters, phone_status: "" }); setPage(1); }}
+                  style={{ background: "#eee", border: "none", padding: "8px 12px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Table */}
-          <table className="leads">
-            <thead>
+          <div style={{ flex: 1, overflowX: "auto" }}>
+            <table className="leads" style={{ margin: 0, width: "100%" }}>
+              <thead>
               <tr>
                 {selectedStatus == "unassigned" && <th>
                   <input
@@ -335,7 +621,9 @@ export const Assigned = () => {
                 </th>}
                 <th>Name</th>
                 <th>Company</th>
-                <th>Region</th>
+                <th>Designation</th>
+                {/* <th>Bucket</th> */}
+                <th>Last Updated</th>
               </tr>
             </thead>
 
@@ -354,18 +642,34 @@ export const Assigned = () => {
                         onChange={() => toggleLead(lead.id)}
                       />
                     </td>}
-                    <td onClick={() => navigate(`/leads/${lead.id}`)} data-label="Name">
+                    <td onClick={() => navigate(`/leads/${lead.id}?${searchParams.toString()}`)} data-label="Name" style={{ cursor: "pointer" }}>
                       {lead.lead_name}
+                      {lead.lead_phones && lead.lead_phones.some(p => p.status === "converted") && (
+                        <span style={{
+                          backgroundColor: "#f59e0b",
+                          color: "white",
+                          padding: "2px 6px",
+                          borderRadius: "4px",
+                          fontSize: "0.75rem",
+                          marginLeft: "8px",
+                          fontWeight: "bold"
+                        }}>Waiting</span>
+                      )}
                     </td>
                     <td data-label="Company">{lead.lead_company || "-"}</td>
-                    <td data-label="Region">{lead.lead_region || "-"}</td>
+                    <td data-label="Designation">{lead.lead_designation || "-"}</td>
+                    {/* <td data-label="Bucket">
+                      <span className={`status-badge ${lead.status}`}>
+                        {BUCKET_NAMES[lead.status] || lead.status}
+                      </span>
+                    </td> */}
+                    <td data-label="Updated">{formatDate(lead.status_updated_at)}</td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
-          
-
+          </div>
 
           {/* BULK CONTROLS BELOW TABLE */}
           <div className="bulk-controls">
@@ -410,6 +714,7 @@ export const Assigned = () => {
               )}
             </div>
           </div>
+          </div>{/* END WHITE CARD */}
         </div>
       </main>
       {/* Filter Modal */}
@@ -417,14 +722,28 @@ export const Assigned = () => {
         <div className="filter-overlay" onClick={() => setShowFilter(false)} />
         <div className="filter-panel">
           <h3>Filter Leads</h3>
-          {["name", "company", "region"].map((key) => (
+          {["name", "company", "designation"].map((key) => (
             <div className="filter-group" key={key}>
               <label>{key}</label>
               <input type="text" value={filters[key]} onChange={(e) => setFilters(
                 { ...filters, [key]: e.target.value })} />
-            </div>))} <div className="filter-actions">
+            </div>))}
+          <div className="filter-group">
+            <label>Phone Status</label>
+            <select
+              value={filters.phone_status}
+              onChange={(e) => setFilters({ ...filters, phone_status: e.target.value })}
+              style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ddd" }}
+            >
+              <option value="">All Statuses</option>
+              {STATUS_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="filter-actions">
             <button className="clear-btn" onClick={() => setFilters(
-              { name: "", company: "", region: "" })} > Clear </button>
+              { name: "", company: "", designation: "", phone_status: "" })} > Clear </button>
             <button className="apply-btn" onClick={() => { setShowFilter(false); setPage(1); }} > Apply </button> </div> </div> </>)}
     </section>
   );

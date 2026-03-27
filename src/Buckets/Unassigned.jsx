@@ -9,7 +9,7 @@ export const BulkAssign = ({ leadIds, onSuccess }) => {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/api/auth/userlist/`, {
+      .get(`${API_BASE_URL}/auth/userlist/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("access")}` },
       })
       .then((res) => setAgents(res.data.data || []));

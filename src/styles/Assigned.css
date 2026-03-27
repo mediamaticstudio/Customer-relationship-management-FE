@@ -4,33 +4,10 @@
 
 .assigned-leads {
   min-height: 90vh;
-  background: var(--cream-bg);
+  background: #ffffff;
   display: flex;
 }
 
-/* ================================
-   HAMBURGER
-================================ */
-.hamburger {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 1001;
-  background: var(--primary-dark);
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-medium);
-  cursor: pointer;
-  display: none;
-  transition: all var(--transition-fast);
-}
-
-.hamburger:hover {
-  transform: scale(1.1);
-  background: var(--primary-mid);
-}
 
 /* ================================
    MAIN CONTENT
@@ -44,7 +21,7 @@
 .content {
   background: transparent;
   border-radius: 12px;
-  padding: 32px;
+  padding: 0;
   box-shadow: none;
   min-height: calc(100vh - 80px);
   display: flex;
@@ -55,13 +32,33 @@
 /* ================================
    HEADER
 ================================ */
+.assigned-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.assigned-header h1 {
+  font-size: 2rem;
+  color: var(--primary-dark);
+  margin: 0;
+  font-weight: 700;
+}
+
+.assigned-header p {
+  color: var(--text-muted-dark);
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+}
+
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 32px;
-  margin-bottom: 40px;
+  margin-bottom: 0px;
   flex-wrap: wrap;
+  padding: 32px 32px 0 32px;
 }
 
 /* ================================
@@ -163,10 +160,9 @@
    TABLE
 ================================ */
 .leads {
-  width: 100%;
+  width: calc(100% - 64px);
   border-collapse: collapse;
-  /* Professional Collapsed */
-  margin-bottom: 32px;
+  margin: 0 32px 32px 32px;
 }
 
 .leads thead {
@@ -281,7 +277,7 @@ input[type="checkbox"]:checked::after {
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding: 24px 0;
+  padding: 24px 32px;
   border-top: 1px solid var(--border-soft);
   gap: 16px;
   width: 100%;
@@ -598,5 +594,67 @@ input[type="checkbox"]:checked::after {
   .bulk-controls {
     flex-direction: column;
     gap: 20px;
+    align-items: stretch;
   }
+
+  .bulk-left,
+  .bulk-center,
+  .bulk-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .pagination button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ================================
+   STATUS BADGES
+================================ */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status-badge.assigned,
+.status-badge.unassigned {
+  background: rgba(91, 15, 27, 0.1);
+  color: #5b0f1b;
+}
+
+.status-badge.prospect,
+.status-badge.deal-won,
+.status-badge.sale-won,
+.status-badge.completed {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+}
+
+.status-badge.followup,
+.status-badge.second-attempt,
+.status-badge.third-attempt {
+  background: rgba(237, 108, 2, 0.1);
+  color: #ed6c02;
+}
+
+.status-badge.sale-lost,
+.status-badge.invalid,
+.status-badge.dnd,
+.status-badge.re-research {
+  background: rgba(211, 47, 47, 0.1);
+  color: #d32f2f;
 }

@@ -1,288 +1,506 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import qs from "qs";
-import Select from "react-select";
+import React, { useState, useEffect } from "react";
+import {
+    FiUsers,
+    FiCheckCircle,
+    FiXCircle,
+    FiTrendingUp,
+    FiPieChart,
+    FiBarChart2,
+    FiCalendar,
+    FiRefreshCw,
+    FiClock,
+    FiX,
+    FiUserCheck,
+    FiBriefcase
+} from "react-icons/fi";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    BarElement,
+} from 'chart.js';
+import { Line, Pie, Bar } from 'react-chartjs-2';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
 import "../styles/Dashboard.css";
-import { Sidebar } from "./Sidebar";
-import { FiX, FiMenu } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config.jsx";
+import { toast } from "react-toastify";
 
-const API_URL = `${API_BASE_URL}/configurations/users/`;
+// Register ChartJS components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    BarElement
+);
 
-export default function Dashboard() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const Dashboard = () => {
+    // State Management
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [timePeriod, setTimePeriod] = useState("daily");
 
-  const navigate = useNavigate();
-  // Filters
-  const [emailFilter, setEmailFilter] = useState("");
-  const [ascNameFilter, setAscNameFilter] = useState([]);
-  const [ascCodeFilter, setAscCodeFilter] = useState([]);
-  const [ascLocationFilter, setAscLocationFilter] = useState([]);
-  const [roleFilter, setRoleFilter] = useState([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+    const [bucketData, setBucketData] = useState({});
+    const [trendData, setTrendData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [activeView, setActiveView] = useState('trend'); // 'trend', 'graph', 'count'
 
-  // Options for multi-selects
-  const [ascNames, setAscNames] = useState([]);
-  const [ascCodes, setAscCodes] = useState([]);
-  const [ascLocations, setAscLocations] = useState([]);
-  const ROLE_OPTIONS = [
-    { value: "SUPERADMIN", label: "Super Admin" },
-    { value: "ADMIN", label: "Admin" },
-    { value: "SUPERVISOR", label: "Supervisor" },
-    { value: "AGENT", label: "Agent" },
-  ];
+    // Fetch Analytics Data
+    const fetchAnalytics = async () => {
+        setLoading(true);
+        try {
+            const startStr = startDate.toISOString().split('T')[0];
+            const endStr = endDate.toISOString().split('T')[0];
 
-  const selectStyles = {
-    control: (base, state) => ({
-      ...base,
-      backgroundColor: "var(--input-bg)",
-      borderColor: state.isFocused ? "var(--primary-mid)" : "var(--border-soft)",
-      borderRadius: "8px",
-      minHeight: "38px",
-      minWidth: "160px",
-      boxShadow: state.isFocused ? `0 0 0 2px var(--border-soft)` : "none",
-      "&:hover": {
-        borderColor: "var(--primary-mid)",
-      },
-    }),
-    menu: (base) => ({
-      ...base,
-      backgroundColor: "var(--card-bg)",
-      borderRadius: "8px",
-      boxShadow: "var(--shadow-medium)",
-      border: "1px solid var(--border-soft)",
-      zIndex: 100,
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused
-        ? "rgba(148, 163, 184, 0.1)"
-        : state.isSelected
-          ? "var(--primary-mid)"
-          : "transparent",
-      color: state.isSelected ? "white" : "var(--text-dark)",
-      cursor: "pointer",
-    }),
-    multiValue: (base) => ({
-      ...base,
-      backgroundColor: "var(--btn-bg)",
-      borderRadius: "6px",
-    }),
-    multiValueLabel: (base) => ({
-      ...base,
-      color: "white",
-      fontWeight: "600",
-    }),
-    multiValueRemove: (base) => ({
-      ...base,
-      color: "white",
-      "&:hover": {
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
-      },
-    }),
-    placeholder: (base) => ({
-      ...base,
-      color: "var(--text-muted-dark)",
-      fontSize: "0.9rem",
-    }),
-    singleValue: (base) => ({
-      ...base,
-      color: "var(--text-dark)",
-    }),
-    input: (base) => ({
-      ...base,
-      color: "var(--text-dark)",
-    }),
-  };
+            const response = await fetch(
+                `${API_BASE_URL}/dashboard/details/?start_date=${startStr}&end_date=${endStr}&period=${timePeriod}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem("access")}`
+                    }
+                }
+            );
 
-  // Auto-fetch users whenever filters change
-  useEffect(() => {
-    fetchUsers();
-  }, [
-    emailFilter,
-    ascNameFilter,
-    ascCodeFilter,
-    ascLocationFilter,
-    roleFilter,
-    startDate,
-    endDate,
-  ]);
+            if (!response.ok) throw new Error("Failed to fetch analytics");
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
+            const resData = await response.json();
+            const rawData = resData.data;
 
-      const params = {};
+            // Combine summary total with individual bucket counts
+            const mappedBuckets = {
+                total: rawData.summary.total_leads,
+                activity: rawData.summary.total_activity,
+                ...rawData.bucket_counts
+            };
 
-      if (emailFilter) params.email = emailFilter;
-      if (ascNameFilter.length) params.asc_name = ascNameFilter.map((i) => i.value);
-      if (ascCodeFilter.length) params.asc_code = ascCodeFilter.map((i) => i.value);
-      if (ascLocationFilter.length) params.asc_location = ascLocationFilter.map((i) => i.value);
-      if (roleFilter.length) params.role = roleFilter.map((i) => i.value);
-      if (startDate) params.start_date = startDate;
-      if (endDate) params.end_date = endDate;
+            setBucketData(mappedBuckets);
+            setTrendData(rawData.trends || []);
+        } catch (error) {
+            console.error("Analytics Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      const queryString = qs.stringify(params, { arrayFormat: "repeat" });
+    useEffect(() => {
+        fetchAnalytics();
+    }, [startDate, endDate, timePeriod]);
 
-      const res = await axios.get(`${API_URL}?${queryString}`);
-      const data = res.data?.results || res.data?.data || [];
+    const handleRefresh = () => {
+        fetchAnalytics();
+    };
 
-      setUsers(data);
+    // Chart Data Preparation Helpers
+    const lineChartData = {
+        labels: trendData.map(d => d.date),
+        datasets: [
+            {
+                label: 'Lead Trends',
+                data: trendData.map(d => d.count),
+                borderColor: '#4d191d',
+                backgroundColor: 'rgba(77, 25, 29, 0.1)',
+                borderWidth: 2,
+                pointBackgroundColor: '#4d191d',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0, // Straight lines as per image
+                fill: false,
+            },
+        ],
+    };
 
-      // Populate dropdown options from fetched data
-      setAscNames([...new Set(data.map((u) => u.asc_name))].map((v) => ({ value: v, label: v })));
-      setAscCodes([...new Set(data.map((u) => u.asc_code))].map((v) => ({ value: v, label: v })));
-      setAscLocations([...new Set(data.map((u) => u.asc_location))].map((v) => ({ value: v, label: v })));
-    } catch (error) {
-      console.error("Failed to fetch users", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const bucketConfig = [
+        { key: 'assigned', label: 'Assigned', color: '#4d191d' },
+        { key: 'second-attempt', label: 'Second Attempt', color: '#ff9f00' },
+        { key: 'third-attempt', label: 'Third Attempt', color: '#ff5252' },
+        { key: 'completed', label: 'Completed', color: '#00c091' },
+        { key: 'followup', label: 'Follow Up', color: '#4081ff' },
+        { key: 'prospect', label: 'Prospect', color: '#8b5cf6' },
+        { key: 're-research', label: 'Re-Research', color: '#475569' },
+        { key: 'deal-won', label: 'Deal Won', color: '#059669' },
+        { key: 'sale-lost', label: 'Deal Lost', color: '#dc2626' },
+        { key: 'dnd', label: 'DND', color: '#64748b' },
+    ];
 
-  const clearFilters = () => {
-    setEmailFilter("");
-    setAscNameFilter([]);
-    setAscCodeFilter([]);
-    setAscLocationFilter([]);
-    setRoleFilter([]);
-    setStartDate("");
-    setEndDate("");
-  };
+    return (
+        <div className="analytics-dashboard">
+            <aside className="sidebar-container">
+                <Sidebar />
+            </aside>
 
-  return (
-    <div className="dashboard">
-      <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>
-        {sidebarOpen ? <FiX /> : <FiMenu />}
-      </button>
-      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <Sidebar />
-      </aside>
+            <main className="analytics-main">
+                <Navbar />
 
-      <main className="main-panel">
-        <header className="panel-header">
-          <h1>User Management</h1>
-          <button className="add-user" onClick={() => navigate('/adduser')}>Add New User</button>
-        </header>
+                {/* Brand Header Row (Title + Filters) */}
+                <div className="dashboard-header-row">
+                    <div className="dashboard-title-group">
+                        <h1 className="dashboard-main-title">Dashboard Overview</h1>
+                    </div>
 
-        {/* FILTERS */}
-        <div className="filters">
-          <input
-            type="text"
-            placeholder="Search Email"
-            value={emailFilter}
-            onChange={(e) => setEmailFilter(e.target.value)}
-          />
+                    <div className="dashboard-filters-container">
+                        <div className="dashboard-controls">
+                            {timePeriod === "daily" && (
+                                <>
+                                    <div className="control-group">
+                                        <label className="control-label">FROM DATE</label>
+                                        <div className="control-input-wrapper">
+                                            <FiCalendar className="inner-icon" />
+                                            <DatePicker
+                                                selected={startDate}
+                                                onChange={(date) => setStartDate(date)}
+                                                selectsStart
+                                                startDate={startDate}
+                                                endDate={endDate}
+                                                dateFormat="MM/dd/yyyy"
+                                                className="compact-input"
+                                            />
+                                        </div>
+                                    </div>
 
-          <Select
-            isMulti
-            placeholder="ASC Name"
-            options={ascNames}
-            value={ascNameFilter}
-            onChange={setAscNameFilter}
-            closeMenuOnSelect={false}
-            styles={selectStyles}
-          />
+                                    <div className="control-group">
+                                        <label className="control-label">TO DATE</label>
+                                        <div className="control-input-wrapper">
+                                            <FiCalendar className="inner-icon" />
+                                            <DatePicker
+                                                selected={endDate}
+                                                onChange={(date) => setEndDate(date)}
+                                                selectsEnd
+                                                startDate={startDate}
+                                                endDate={endDate}
+                                                minDate={startDate}
+                                                dateFormat="MM/dd/yyyy"
+                                                className="compact-input"
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
 
-          <Select
-            isMulti
-            placeholder="ASC Code"
-            options={ascCodes}
-            value={ascCodeFilter}
-            onChange={setAscCodeFilter}
-            closeMenuOnSelect={false}
-            styles={selectStyles}
-          />
+                            <div className="control-group">
+                                <label className="control-label">TIME PERIOD</label>
+                                <select
+                                    value={timePeriod}
+                                    onChange={(e) => setTimePeriod(e.target.value)}
+                                    className="compact-select"
+                                >
+                                    <option value="daily">Daily View</option>
+                                    <option value="weekly">Weekly View</option>
+                                    <option value="yearly">Yearly View</option>
+                                </select>
+                            </div>
 
-          <Select
-            isMulti
-            placeholder="ASC Location"
-            options={ascLocations}
-            value={ascLocationFilter}
-            onChange={setAscLocationFilter}
-            closeMenuOnSelect={false}
-            styles={selectStyles}
-          />
+                            <button className="refresh-icon-btn" onClick={handleRefresh} disabled={loading}>
+                                {loading ? "..." : <FiRefreshCw />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-          <Select
-            isMulti
-            placeholder="Role"
-            options={ROLE_OPTIONS}
-            value={roleFilter}
-            onChange={setRoleFilter}
-            closeMenuOnSelect={false}
-            styles={selectStyles}
-          />
+                {/* Summary Cards Grid */}
+                <section className="summary-cards">
+                    <div className="summary-card">
+                        <div className="card-top-row">
+                            <div className="card-title-group">
+                                <div className="card-icon" style={{ background: '#fff5f5', color: '#ff4d4f' }}>
+                                    <FiTrendingUp />
+                                </div>
+                                <h3>TOTAL ATTENDED</h3>
+                            </div>
+                            <p className="card-value">{bucketData.activity || 0}</p>
+                        </div>
+                        <span className="card-subtitle">In selected period</span>
+                    </div>
 
-          <input
-            type="date"
-            placeholder="From Date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            placeholder="To Date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
+                    <div className="summary-card">
+                        <div className="card-top-row">
+                            <div className="card-title-group">
+                                <div className="card-icon" style={{ background: '#f0f5ff', color: '#2f54eb' }}>
+                                    <FiUsers />
+                                </div>
+                                <h3>TOTAL ASSIGNED</h3>
+                            </div>
+                            <p className="card-value">{bucketData.assigned || 0}</p>
+                        </div>
+                        <span className="card-subtitle">In selected period</span>
+                    </div>
 
-          {/* Clear Filters */}
-          <button className="clear-filters" onClick={clearFilters} title="Clear Filters">
-            <FiX size={20} />
-          </button>
+                    <div className="summary-card">
+                        <div className="card-top-row">
+                            <div className="card-title-group">
+                                <div className="card-icon" style={{ background: '#f6ffed', color: '#52c41a' }}>
+                                    <FiCheckCircle />
+                                </div>
+                                <h3>DEAL WON</h3>
+                            </div>
+                            <p className="card-value">{bucketData["deal-won"] || 0}</p>
+                        </div>
+                        <span className="card-subtitle">Successful conversions</span>
+                    </div>
+
+                    <div className="summary-card">
+                        <div className="card-top-row">
+                            <div className="card-title-group">
+                                <div className="card-icon" style={{ background: '#e6f7ff', color: '#1890ff' }}>
+                                    <FiClock />
+                                </div>
+                                <h3>FOLLOW-UP</h3>
+                            </div>
+                            <p className="card-value">{bucketData["followup"] || 0}</p>
+                        </div>
+                        <span className="card-subtitle">Active leads</span>
+                    </div>
+
+                    {/* Additional cards match the look of reference */}
+                    <div className="summary-card">
+                        <div className="card-top-row">
+                            <div className="card-title-group">
+                                <div className="card-icon" style={{ background: '#f9f0ff', color: '#722ed1' }}>
+                                    <FiUserCheck />
+                                </div>
+                                <h3>PROSPECT</h3>
+                            </div>
+                            <p className="card-value">{bucketData.prospect || 0}</p>
+                        </div>
+                        <span className="card-subtitle">Potential deals</span>
+                    </div>
+
+                    <div className="summary-card">
+                        <div className="card-top-row">
+                            <div className="card-title-group">
+                                <div className="card-icon" style={{ background: '#fff1f0', color: '#f5222d' }}>
+                                    <FiXCircle />
+                                </div>
+                                <h3>DEAL LOST</h3>
+                            </div>
+                            <p className="card-value">{bucketData["sale-lost"] || 0}</p>
+                        </div>
+                        <span className="card-subtitle">Lost sales</span>
+                    </div>
+                </section>
+
+                {/* View Switcher */}
+                <div className="view-switcher">
+                    <button className={`view-btn ${activeView === 'trend' ? 'active' : ''}`} onClick={() => setActiveView('trend')}>
+                        <FiTrendingUp /> Trends
+                    </button>
+                    <button className={`view-btn ${activeView === 'graph' ? 'active' : ''}`} onClick={() => setActiveView('graph')}>
+                        <FiPieChart /> Graph
+                    </button>
+                    <button className={`view-btn ${activeView === 'count' ? 'active' : ''}`} onClick={() => setActiveView('count')}>
+                        <FiBarChart2 /> Count
+                    </button>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="chart-area-container">
+                    {activeView === 'trend' && (
+                        <div className="chart-card full-width">
+                            <div className="chart-header">
+                                <h3>Lead Trends Over Time</h3>
+                                <p className="chart-subtitle">Daily breakdown</p>
+                            </div>
+                            <div className="chart-container" style={{ height: '300px' }}>
+                                <Line
+                                    data={lineChartData}
+                                    options={{
+                                        maintainAspectRatio: false,
+                                        responsive: true,
+                                        plugins: {
+                                            legend: {
+                                                position: 'top',
+                                                align: 'center',
+                                                labels: {
+                                                    boxWidth: 40,
+                                                    boxHeight: 12,
+                                                    padding: 20,
+                                                    font: { size: 12, weight: '700' }
+                                                }
+                                            }
+                                        },
+                                        scales: {
+                                            x: {
+                                                grid: { display: false },
+                                                ticks: {
+                                                    maxRotation: 45,
+                                                    minRotation: 45,
+                                                    font: { size: 10, weight: '600' },
+                                                    autoSkip: false
+                                                }
+                                            },
+                                            y: {
+                                                min: -1.0,
+                                                max: 1.0,
+                                                grid: { color: '#f0f0f0' },
+                                                ticks: {
+                                                    stepSize: 0.2,
+                                                    font: { size: 10 },
+                                                    callback: (value) => value.toFixed(1)
+                                                }
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+
+                    {activeView === 'graph' && (
+                        <div className="charts-grid-two">
+                            <div className="chart-card half-width">
+                                <div className="chart-header">
+                                    <h3>Bucket Distribution</h3>
+                                    <p className="chart-subtitle">Lead status breakdown</p>
+                                </div>
+                                <div className="chart-container" style={{ height: '300px' }}>
+                                    <Pie
+                                        data={{
+                                            labels: bucketConfig.map(b => b.label),
+                                            datasets: [{
+                                                data: bucketConfig.map(b => bucketData[b.key] || 0),
+                                                backgroundColor: bucketConfig.map(b => b.color),
+                                                borderWidth: 0
+                                            }]
+                                        }}
+                                        options={{
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    position: 'right',
+                                                    labels: {
+                                                        usePointStyle: true,
+                                                        pointStyle: 'rect',
+                                                        padding: 15,
+                                                        font: {
+                                                            size: 11,
+                                                            weight: '700'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="chart-card half-width">
+                                <div className="chart-header">
+                                    <h3>Bucket Comparison</h3>
+                                    <p className="chart-subtitle">Leads per status</p>
+                                </div>
+                                <div className="chart-container" style={{ height: '300px' }}>
+                                    <Bar
+                                        data={{
+                                            labels: bucketConfig.map(b => b.label),
+                                            datasets: [{
+                                                label: 'Leads Count',
+                                                data: bucketConfig.map(b => bucketData[b.key] || 0),
+                                                backgroundColor: bucketConfig.map(b => b.color),
+                                                borderRadius: 4
+                                            }]
+                                        }}
+                                        options={{
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    display: true,
+                                                    position: 'top',
+                                                    align: 'end',
+                                                    labels: {
+                                                        boxWidth: 40,
+                                                        boxHeight: 12,
+                                                        usePointStyle: false,
+                                                        font: {
+                                                            size: 11,
+                                                            weight: '600'
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            scales: {
+                                                x: {
+                                                    grid: { display: false },
+                                                    ticks: {
+                                                        font: { size: 10, weight: '600' },
+                                                        maxRotation: 45,
+                                                        minRotation: 45
+                                                    }
+                                                },
+                                                y: {
+                                                    beginAtZero: true,
+                                                    grid: { color: '#f0f0f0' },
+                                                    ticks: {
+                                                        stepSize: 0.1,
+                                                        font: { size: 10 }
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeView === 'count' && (
+                        <div className="chart-card full-width">
+                            <div className="chart-header">
+                                <h3>Detailed Bucket Statistics</h3>
+                                <p className="chart-subtitle">Lead status breakdown and conversion rates</p>
+                            </div>
+                            <div className="stats-table-wrapper">
+                                <table className="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Count</th>
+                                            <th>Percentage</th>
+                                            <th>Visual</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {bucketConfig.map((item) => {
+                                            const count = bucketData[item.key] || 0;
+                                            const total = bucketData.total || 1;
+                                            const percentage = ((count / total) * 100).toFixed(0);
+                                            return (
+                                                <tr key={item.key}>
+                                                    <td>{item.label}</td>
+                                                    <td className="count-col">{count}</td>
+                                                    <td>{percentage}%</td>
+                                                    <td className="visual-col">
+                                                        <div className="progress-bg">
+                                                            <div className="progress-bar" style={{ width: `${percentage}%`, backgroundColor: item.color }}></div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            </main>
         </div>
+    );
+};
 
-        {/* TABLE */}
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>Email & Contact</th>
-              <th>Name</th>
-              <th>ASC Details</th>
-              <th>Role</th>
+export default Dashboard;
 
-              {/* <th>Actions</th> */}
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6">Loading users...</td>
-              </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan="6">No users found</td>
-              </tr>
-            ) : (
-              users.map((user) => (
-                <tr key={user.id}>
-                  <td data-label="User ID">#{user.id}</td>
-                  <td data-label="Email & Contact">
-                    <div>{user.email}</div>
-                    <div className="muted">{user.phone_no}</div>
-                  </td>
-                  <td data-label="Name">{user.asc_name}</td>
-                  <td data-label="ASC Details">
-                    {user.asc_code} • {user.asc_location}
-                  </td>
-                  <td data-label="Role">{user.role}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-
-        <footer className="pagination">
-          Showing {users.length} users
-        </footer>
-      </main>
-    </div>
-  );
-}

@@ -27,10 +27,13 @@ export const ResetPassword = () => {
 
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/auth/reset-password/${token}/`,
+        `${API_BASE_URL}/auth/reset-password/${token}/`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-DB-Name": localStorage.getItem("selected_db") || "default"
+          },
           body: JSON.stringify({ password }),
         }
       );
