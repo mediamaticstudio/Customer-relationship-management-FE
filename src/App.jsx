@@ -25,6 +25,7 @@ import UserManagement from "./components/UserManagement";
 import { ASCLogin } from "./components/ASCLogin";
 import ASCCredentialsManager from "./components/ASCCredentialsManager";
 import NotFound from "./components/NotFound";
+import DynamicRequirementForm from "./components/DynamicRequirementForm";
 
 
 import { useEffect } from "react";
@@ -66,6 +67,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/support" element={<ContactSupport />} />
+        <Route path="/requirements/:serviceId/:leadId" element={<DynamicRequirementForm />} />
         <Route path="/asc-credentials" element={<ASCCredentialsManager />} />
         {/* Catch-all route for 404 Not Found Page */}
         <Route path="*" element={<NotFound />} />

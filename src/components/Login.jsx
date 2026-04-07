@@ -156,10 +156,7 @@ export const Login = () => {
       {/* RIGHT LOGIN PANEL */}
       <div className="form-panel">
         <div className="form-container">
-          <div className="form-header">
-            <h2>Welcome Back</h2>
-            <p className="subtitle">Sign in to continue to your CRM dashboard</p>
-          </div>
+
 
           <form className="login-form" onSubmit={handleLogin} noValidate>
             <div className="input-group">

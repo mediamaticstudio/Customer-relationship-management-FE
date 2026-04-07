@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../config.jsx";
+import { FiUpload, FiLayers, FiRefreshCcw } from "react-icons/fi";
 
 export default function ImportLeads() {
   const [file, setFile] = useState(null);
@@ -74,26 +75,9 @@ export default function ImportLeads() {
   const languages = ["General", "Tamil", "Malayalam", "Kannada", "Telugu", "Hindi", "English"];
 
   return (
-    <div className="import-box" style={{ gap: '12px' }}>
-      <div className="location-selector" style={{ marginBottom: 0 }}>
-        {/* <label htmlFor="location-select">SELECT AGENT LOCATION:</label> */}
-        {/* <select
-          id="location-select"
-          value={selectedLocation}
-          onChange={(e) => setSelectedLocation(e.target.value)}
-          className="location-dropdown"
-        >
-          <option value="">-- All Locations (Default) --</option>
-          {locations.map((loc) => (
-            <option key={loc} value={loc}>
-              {loc}
-            </option>
-          ))}
-        </select> */}
-      </div>
-
-      <div className="location-selector" style={{ marginBottom: '10px' }}>
-        <label htmlFor="language-select">SELECT LANGUAGE:</label>
+    <div className="import-box">
+      <div className="location-selector">
+        <label htmlFor="language-select">Target Language</label>
         <select
           id="language-select"
           value={selectedLanguage}
@@ -109,6 +93,7 @@ export default function ImportLeads() {
       </div>
 
       <label className="file-input">
+        <FiUpload style={{ marginRight: '10px' }} />
         {file ? file.name : "Choose CSV / Excel File"}
         <input
           type="file"
@@ -121,9 +106,10 @@ export default function ImportLeads() {
       <button
         onClick={handleImport}
         disabled={loading}
-        className="settings-btn import-btn"
+        className="settings-btn"
       >
-        {loading ? "Importing..." : "Import File"}
+        {loading ? <FiRefreshCcw className="spinning" /> : <FiLayers />}
+        {loading ? "Importing..." : "Import Leads"}
       </button>
     </div>
   );

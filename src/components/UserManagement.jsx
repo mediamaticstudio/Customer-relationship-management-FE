@@ -5,7 +5,8 @@ import Select from "react-select";
 import "../styles/UserManagement.css";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
-import { FiX, FiMenu } from "react-icons/fi";
+import { FiX, FiMenu , FiUserPlus} from "react-icons/fi";
+import { FaSearch} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config.jsx";
 
@@ -192,19 +193,24 @@ export default function UserManagement() {
       </aside>
 
       <main className="main-panel">
+        
         <Navbar pageTitle="User Management" subTitle="Manage your system users" />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', padding: '0 30px' }}>
-          <button className="add-user" onClick={() => navigate('/adduser')}>Add New User</button>
-        </div>
-
-        {/* FILTERS */}
-        <div className="filters">
-          <input
+        <div style={{ marginBottom: '20px', padding: '0 30px' }}>
+           <div className="search-container"> 
+            <div className="search-bar"> <FaSearch /><input
             type="text"
             placeholder="Search Email"
             value={emailFilter}
             onChange={(e) => setEmailFilter(e.target.value)}
-          />
+          /></div>
+             <button className="add-user" onClick={() => navigate('/adduser')}>Create <FiUserPlus /> </button>
+         </div>
+        </div>
+
+        {/* FILTERS */}
+
+        <div className="filters">
+         
 
           <Select
             isMulti

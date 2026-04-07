@@ -96,8 +96,20 @@ export const ClientPortal = () => {
   const mapPackageNames = (selectedIds) => {
     if (!selectedIds || !packages.length) return [];
     return selectedIds.map(id => {
-      const pkg = packages.find(p => p.id === id) || 
-                  packages.flatMap(p => p.sub_packages || []).find(sub => sub.id === id);
+      // Normalize ID by removing prefixes (pkg_ or sub_)
+      let targetId = id;
+      if (typeof id === "string") {
+        if (id.startsWith("pkg_")) {
+          targetId = parseInt(id.replace("pkg_", ""), 10);
+        } else if (id.startsWith("sub_")) {
+          targetId = parseInt(id.replace("sub_", ""), 10);
+        } else if (!isNaN(id)) {
+          targetId = parseInt(id, 10);
+        }
+      }
+
+      const pkg = packages.find(p => p.id === targetId) || 
+                  packages.flatMap(p => p.sub_packages || []).find(sub => sub.id === targetId);
       return pkg ? (pkg.package_name || pkg.sub_package_name) : `Pkg #${id}`;
     });
   };

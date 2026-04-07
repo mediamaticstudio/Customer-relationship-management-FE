@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import {
     FiMenu, FiX, FiDownload, FiPrinter, FiLayers, FiUserCheck,
     FiRepeat, FiRefreshCcw, FiCheckCircle, FiPhoneForwarded,
-    FiStar, FiAward, FiEye, FiAlertCircle, FiMinusCircle, FiPhone, FiUser, FiUserPlus, FiUserMinus
+    FiStar, FiAward, FiEye, FiAlertCircle, FiMinusCircle, FiPhone, FiUser, FiUserPlus, FiUserMinus,
+    FiGrid, FiFileText, FiUsers, FiChevronLeft, FiChevronRight
 } from "react-icons/fi";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
@@ -16,9 +17,72 @@ import { toast } from "react-toastify";
 export default function Reports() {
     const navigate = useNavigate();
     const user_role = localStorage.getItem("role")?.toUpperCase();
+
+    // Tab Configuration based on user role
+    const tabs = [
+        { id: "overview", label: "Overview", icon: <FiGrid />, roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
+        { id: "lead-reports", label: "Lead Reports", icon: <FiFileText />, roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
+        { id: "agent-performance", label: "Agent Performance", icon: <FiUsers />, roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
+        { id: "disposition-wise", label: "Disposition Wise", icon: <FiRepeat />, roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
+        { id: "asc-wise", label: "ASC Wise", icon: <FiLayers />, roles: ["SUPERADMIN", "ADMIN"] },
+        { id: "prospect-wise", label: "Prospect Wise", icon: <FiStar />, roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
+        { id: "followup-wise", label: "Followup Wise", icon: <FiPhoneForwarded />, roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
+    ];
+
+    const visibleTabs = tabs.filter((tab) => tab.roles.includes(user_role));
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
     const [loading, setLoading] = useState(false);
+    const tabsRef = useRef(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+
+    const checkScroll = () => {
+        if (tabsRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+        }
+    };
+
+    useEffect(() => {
+        checkScroll();
+        window.addEventListener("resize", checkScroll);
+        return () => window.removeEventListener("resize", checkScroll);
+    }, [visibleTabs]);
+
+    const scrollTabs = (direction) => {
+        if (tabsRef.current) {
+            const scrollAmount = 200;
+            tabsRef.current.scrollBy({
+                left: direction === "left" ? -scrollAmount : scrollAmount,
+                behavior: "smooth"
+            });
+            setTimeout(checkScroll, 400); // Wait for smooth scroll to finish
+        }
+    };
+
+    const renderTabContent = () => {
+        if (!reportData && activeTab !== "overview") return <div className="no-data">No data found for this report.</div>;
+
+        switch (activeTab) {
+            case "overview":
+                return <OverviewTab data={reportData} />;
+            case "lead-reports":
+            case "prospect-wise":
+            case "followup-wise":
+                return <LeadReportsTab data={reportData} />;
+            case "agent-performance":
+                return <AgentPerformanceTab data={reportData} />;
+            case "disposition-wise":
+                return <DispositionWiseTab data={reportData} />;
+            case "asc-wise":
+                return <ASCWiseTab data={reportData} navigate={navigate} />;
+            default:
+                return null;
+        }
+    };
 
     // Simple Filters
     const [ascCode, setAscCode] = useState([]);
@@ -40,18 +104,7 @@ export default function Reports() {
     const [locationOptions, setLocationOptions] = useState([]);
     const [dispositionOptions, setDispositionOptions] = useState([]);
 
-    // Tab Configuration based on user role
-    const tabs = [
-        { id: "overview", label: "Overview", roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
-        { id: "lead-reports", label: "Lead Reports", roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
-        { id: "agent-performance", label: "Agent Performance", roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
-        { id: "disposition-wise", label: "Disposition Wise", roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
-        { id: "asc-wise", label: "ASC Wise", roles: ["SUPERADMIN", "ADMIN"] },
-        { id: "prospect-wise", label: "Prospect Wise", roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
-        { id: "followup-wise", label: "Followup Wise", roles: ["SUPERADMIN", "ADMIN", "SUPERVISOR"] },
-    ];
 
-    const visibleTabs = tabs.filter((tab) => tab.roles.includes(user_role));
 
     useEffect(() => {
         fetchFilterOptions();
@@ -173,101 +226,7 @@ export default function Reports() {
         }
     };
 
-    // const generateMockReportData = (tabId) => {
-    //     switch (tabId) {
-    //         case "overview":
-    //             return {
-    //                 total_leads: 1000,
-    //                 assigned: 2,
-    //                 completed: 0,
-    //                 deal_won: 0,
-    //                 deal_lost: 0,
-    //                 in_progress: 5,
-    //             };
-    //         case "lead-reports":
-    //             return {
-    //                 leads: [
-    //                     {
-    //                         lead_id: "#493",
-    //                         email_contact: "{'type': 'office', 'email': 'jacqueline92@example.org'} | {'type': 'mobile', 'phone': '361.445.6229', 'status': 'followup', 'remarks': 'testing', 'connected': False, 'call_count': 2, 'followup_date': ''}",
-    //                         lead_name: "Brian Miller",
-    //                         lead_company: "Aguilar, Rodriguez and Monroe",
-    //                         asc_details: "12345678 - Hopes",
-    //                         status: "followup",
-    //                         assigned_to_email: "moni@gmail.com"
-    //                     },
-    //                     {
-    //                         lead_id: "#1000",
-    //                         email_contact: "{'type': 'office', 'email': 'angelachapman@example.com'} | {'type': 'mobile', 'phone': '703-873-0299', 'connected': False}",
-    //                         lead_name: "Douglas Morgan",
-    //                         lead_company: "Smith LLC",
-    //                         asc_details: "Unassigned",
-    //                         status: "assigned"
-    //                     },
-    //                     {
-    //                         lead_id: "#151",
-    //                         email_contact: "{'type': 'office', 'email': 'mary09@example.org'} | {'type': 'mobile', 'phone': '(417)222-3329x4490', 'status': 'prospect', 'remarks': 'I have intrest but i will call you after some days', 'connected': False, 'call_count': 1, 'followup_date': ''}",
-    //                         lead_name: "Gary Richardson",
-    //                         lead_company: "Acevedo LLC",
-    //                         asc_details: "Unassigned",
-    //                         status: "prospect"
-    //                     },
-    //                     {
-    //                         lead_id: "#741",
-    //                         email_contact: "{'type': 'office', 'email': 'jeffreymacias@example.com'} | {'type': 'mobile', 'phone': '001-597-547-1092x086', 'status': 'voicemail', 'connected': False, 'call_count': 0, 'followup_date': ''}",
-    //                         lead_name: "Sydney Jackson",
-    //                         lead_company: "Alexander, Russell and Banks",
-    //                         asc_details: "Unassigned",
-    //                         status: "second-attempt"
-    //                     },
-    //                 ],
-    //             };
-    //         case "agent-performance":
-    //             return {
-    //                 agents: [
-    //                     {
-    //                         agent_id: 14,
-    //                         agent_name: "Moni",
-    //                         asc_code: "12345678",
-    //                         asc_location: "Hopes",
-    //                         assigned: 2,
-    //                         completed: 0,
-    //                         deal_won: 0,
-    //                         conversion_rate: "0.0%",
-    //                         performance_score: 1
-    //                     }
-    //                 ],
-    //             };
-    //         case "disposition-wise":
-    //             return {
-    //                 dispositions: [
-    //                     { disposition: "Assigned", count: 2, percentage: "0.2%", color: "#FF9800", icon: "👤" },
-    //                     { disposition: "Call Back", count: 1, percentage: "0.1%", color: "#FFC107", icon: "📞" },
-    //                     { disposition: "Prospect", count: 1, percentage: "0.1%", color: "#2196F3", icon: "🌟" }
-    //                 ],
-    //             };
-    //         case "asc-wise":
-    //             return {
-    //                 ascs: [
-    //                     {
-    //                         asc_code: "12345678",
-    //                         asc_name: "Moni",
-    //                         asc_location: "Hopes",
-    //                         contact_person: "moni@gmail.com",
-    //                         phone: "7878787878",
-    //                         total_leads: 2,
-    //                         completed: 0,
-    //                         deal_won: 0,
-    //                         deal_lost: 0,
-    //                         conversion_rate: "0.0%",
-    //                         performance_trend: "down"
-    //                     }
-    //                 ],
-    //             };
-    //         default:
-    //             return {};
-    //     }
-    // };
+
 
     const handleExport = async () => {
         const queryParams = {
@@ -418,151 +377,156 @@ export default function Reports() {
             </aside>
 
             <main className="reports-main">
-                <Navbar pageTitle="Reports" subTitle="System Analytics & Lead Statistics" />
-                <header className="reports-header strip-container">
-                    <div className="tabs-navigation">
-                        <div className="tabs-group">
-                            {visibleTabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    className={`tab-btn ${activeTab === tab.id ? "active" : ""}`}
-                                    onClick={() => setActiveTab(tab.id)}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
+                <Navbar pageTitle="Reports" subTitle="System Analytics & Analytics" />
 
-                        {activeTab !== "overview" && (
+                <div className="reports-scrollable-area">
+                    <header className="reports-header sticky-header">
+                        <div className="tabs-navigation">
+                            <div className="tabs-scroll-container">
+                                <button 
+                                    className="scroll-btn left" 
+                                    onClick={() => scrollTabs('left')}
+                                    disabled={!canScrollLeft}
+                                >
+                                    <FiChevronLeft />
+                                </button>
+                                
+                                <div className="tabs-group" ref={tabsRef} onScroll={checkScroll}>
+                                    {visibleTabs.map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            className={`tab-btn-premium ${activeTab === tab.id ? "active" : ""}`}
+                                            onClick={() => setActiveTab(tab.id)}
+                                        >
+                                            <span className="tab-icon">{tab.icon}</span>
+                                            <span className="tab-label">{tab.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button 
+                                    className="scroll-btn right" 
+                                    onClick={() => scrollTabs('right')}
+                                    disabled={!canScrollRight}
+                                >
+                                    <FiChevronRight />
+                                </button>
+                            </div>
+
                             <div className="report-actions">
-                                <button className="print-btn" onClick={handlePrint}>
+                                <button className="print-btn" onClick={() => window.print()}>
                                     <FiPrinter /> Print
                                 </button>
                                 <button className="export-btn" onClick={handleExport}>
                                     <FiDownload /> Export
                                 </button>
                             </div>
+                        </div>
+                    </header>
+
+                    {/* Filter Bar */}
+                    {activeTab !== "overview" && (
+                        <section className="reports-filters-inline">
+                            <div className="react-select-container">
+                                <Select
+                                    isMulti
+                                    value={ascCode}
+                                    options={ascCodeOptions.map(c => ({ value: c, label: c }))}
+                                    onChange={setAscCode}
+                                    placeholder="ASC Code"
+                                    classNamePrefix="react-select"
+                                />
+                            </div>
+                            <div className="react-select-container">
+                                <Select
+                                    isMulti
+                                    value={ascName}
+                                    options={ascNameOptions.map(n => ({ value: n, label: n }))}
+                                    onChange={setAscName}
+                                    placeholder="ASC Name"
+                                    classNamePrefix="react-select"
+                                />
+                            </div>
+                            <div className="react-select-container">
+                                <Select
+                                    isMulti
+                                    value={ascLocation}
+                                    options={locationOptions.map(l => ({ value: l, label: l }))}
+                                    onChange={setAscLocation}
+                                    placeholder="Location"
+                                    classNamePrefix="react-select"
+                                />
+                            </div>
+                            
+                            {!["prospect-wise", "followup-wise"].includes(activeTab) && (
+                                <div className="react-select-container">
+                                    <Select
+                                        isMulti
+                                        value={disposition}
+                                        options={dispositionOptions.map(d => ({ value: d, label: d }))}
+                                        onChange={setDisposition}
+                                        placeholder="Disposition"
+                                        classNamePrefix="react-select"
+                                    />
+                                </div>
+                            )}
+
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="filter-date"
+                            />
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="filter-date"
+                            />
+                            <button className="clear-filter-btn" onClick={clearFilters} title="Clear">
+                                <FiX />
+                            </button>
+                        </section>
+                    )}
+
+                    {/* Report Content */}
+                    <section className="tab-content">
+                        {loading ? (
+                            <div className="loading-state">Loading report data...</div>
+                        ) : (
+                            renderTabContent()
                         )}
-                    </div>
-                </header>
+                    </section>
 
-                {/* Filters Section - User Management Style */}
-                <section className="reports-filters-inline">
-                    {["SUPERADMIN", "ADMIN", "SUPERVISOR"].includes(user_role) && (
-                        <>
-                            <Select
-                                value={ascCode}
-                                onChange={setAscCode}
-                                options={ascCodeOptions.map(code => ({ value: code, label: code }))}
-                                isMulti
-                                placeholder="ASC Code"
-                                className="react-select-container"
-                                classNamePrefix="react-select"
-                                styles={customSelectStyles}
-                            />
-
-                            <Select
-                                value={ascName}
-                                onChange={setAscName}
-                                options={ascNameOptions.map(name => ({ value: name, label: name }))}
-                                isMulti
-                                placeholder="ASC Name"
-                                className="react-select-container"
-                                classNamePrefix="react-select"
-                                styles={customSelectStyles}
-                            />
-
-                            <Select
-                                value={ascLocation}
-                                onChange={setAscLocation}
-                                options={locationOptions.map(location => ({ value: location, label: location }))}
-                                isMulti
-                                placeholder="ASC Location"
-                                className="react-select-container"
-                                classNamePrefix="react-select"
-                                styles={customSelectStyles}
-                            />
-                        </>
+                    {/* Pagination */}
+                    {activeTab !== "overview" && totalCount > PAGE_SIZE && (
+                        <div className="pagination-controls">
+                            <button
+                                className="page-btn"
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(prev => prev - 1)}
+                            >
+                                Previous
+                            </button>
+                            <span className="page-info">
+                                Page {currentPage} of {Math.ceil(totalCount / PAGE_SIZE)}
+                            </span>
+                            <button
+                                className="page-btn"
+                                disabled={currentPage >= Math.ceil(totalCount / PAGE_SIZE)}
+                                onClick={() => setCurrentPage(prev => prev + 1)}
+                            >
+                                Next
+                            </button>
+                        </div>
                     )}
-
-                    {!["prospect-wise", "followup-wise"].includes(activeTab) && (
-                        <Select
-                            value={disposition}
-                            onChange={setDisposition}
-                            options={dispositionOptions.map(disp => ({ value: disp, label: disp }))}
-                            isMulti
-                            placeholder="Disposition"
-                            className="react-select-container"
-                            classNamePrefix="react-select"
-                            styles={customSelectStyles}
-                        />
+                    {/* Showing count */}
+                    {activeTab !== "overview" && totalCount > 0 && (
+                        <div className="showing-count">
+                            Showing {PAGE_SIZE * (currentPage - 1) + 1} to {Math.min(PAGE_SIZE * currentPage, totalCount)} of {totalCount} records
+                        </div>
                     )}
-
-                    <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="filter-date"
-                        placeholder="Start Date"
-                    />
-
-                    <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="filter-date"
-                        placeholder="End Date"
-                    />
-
-                    <button className="clear-filter-btn" onClick={clearFilters}>
-                        ✕
-                    </button>
-                </section>
-
-                {/* Tab Content */}
-                <section className="tab-content">
-                    {loading ? (
-                        <div className="loading-state">Loading report data...</div>
-                    ) : (
-                        <>
-                            {activeTab === "overview" && <OverviewTab data={reportData} />}
-                            {(activeTab === "lead-reports" || activeTab === "prospect-wise" || activeTab === "followup-wise") && <LeadReportsTab data={reportData} />}
-                            {activeTab === "agent-performance" && <AgentPerformanceTab data={reportData} />}
-                            {activeTab === "disposition-wise" && <DispositionWiseTab data={reportData} />}
-                            {activeTab === "asc-wise" && <ASCWiseTab data={reportData} navigate={navigate} />}
-                        </>
-                    )}
-                </section>
-
-                {/* Pagination Controls */}
-                {activeTab !== "overview" && activeTab !== "disposition-wise" && totalCount > PAGE_SIZE && (
-                    <div className="pagination-controls">
-                        <button
-                            className="page-btn"
-                            disabled={currentPage === 1}
-                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        >
-                            Previous
-                        </button>
-                        <span className="page-info">
-                            Page {currentPage} of {Math.ceil(totalCount / PAGE_SIZE)}
-                        </span>
-                        <button
-                            className="page-btn"
-                            disabled={currentPage >= Math.ceil(totalCount / PAGE_SIZE)}
-                            onClick={() => setCurrentPage(prev => prev + 1)}
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
-
-                {/* Showing count */}
-                {activeTab !== "overview" && totalCount > 0 && (
-                    <div className="showing-count">
-                        Showing {PAGE_SIZE * (currentPage - 1) + 1} to {Math.min(PAGE_SIZE * currentPage, totalCount)} of {totalCount} records
-                    </div>
-                )}
+                </div>
             </main>
         </div>
     );
