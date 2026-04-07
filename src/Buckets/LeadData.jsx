@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Sidebar } from "../components/Sidebar";
@@ -390,7 +390,7 @@ export const LeadData = () => {
             <div className="col-left">
               {isUnassigned && (
                 <div style={{ background: "#fff3cd", color: "#856404", padding: "16px", borderRadius: "12px", fontWeight: "700", marginBottom: "10px" }}>
-                  ⚠️ This lead is currently Unassigned. Please assign it to an agent before making changes.
+                  ⚠️ This lead is currently Unassigned. Please assign it to an agent before making changes.
                 </div>
               )}
 
@@ -414,7 +414,7 @@ export const LeadData = () => {
                         <FiEdit2 size={16} />
                       </button>
                     </div>
-                    <p>{lead.lead_designation} • {lead.lead_company}</p>
+                    <p>{lead.lead_designation} â€¢ {lead.lead_company}</p>
                   </div>
                   <span className="status-badge">
                     {lead.status.replace(/-/g, " ")}
@@ -893,252 +893,6 @@ export const LeadData = () => {
           </div>
         </div>
         {/* REQUIREMENT MODAL */}
-        {isRequirementModalOpen && activeRequirementPkg && (
-          <div className="modal-overlay" onClick={() => setIsRequirementModalOpen(false)}>
-            <div className="modal-container" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2><FiFileText /> {activeRequirementPkg.package_name} Requirements</h2>
-                <button className="close-modal-btn" onClick={() => setIsRequirementModalOpen(false)}>
-                  <FiPlus style={{ transform: "rotate(45deg)" }} />
-                </button>
-              </div>
-              <div className="modal-body">
-                {activeRequirementPkg.requirement_form_type === "website" ? (
-                  <WebsiteRequirementForm
-                    leadId={id}
-                    packageId={activeRequirementPkg.id}
-                    lead={lead}
-                    onClose={() => setIsRequirementModalOpen(false)}
-                  />
-                ) : activeRequirementPkg.requirement_form_type === "seo" ? (
-                  <SEORequirementForm
-                    leadId={id}
-                    packageId={activeRequirementPkg.id}
-                    lead={lead}
-                    onClose={() => setIsRequirementModalOpen(false)}
-                  />
-                ) : activeRequirementPkg.requirement_form_type === "smo" ? (
-                  <SMORequirementForm
-                    leadId={id}
-                    packageId={activeRequirementPkg.id}
-                    lead={lead}
-                    onClose={() => setIsRequirementModalOpen(false)}
-                  />
-                ) : (
-                  <div style={{ padding: "40px", textAlign: "center" }}>
-                    <FiFileText size={48} style={{ opacity: 0.2, marginBottom: "20px" }} />
-                    <h3>Coming Soon</h3>
-                    <p>The requirement form for {activeRequirementPkg.package_name} is under development.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-};
-
-export default LeadData;
-
-          <div className="modal-overlay" onClick={() => setIsRequirementModalOpen(false)}>
-            <div className="modal-container" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2><FiFileText /> Requirement Form</h2>
-                <button className="close-modal-btn" onClick={() => setIsRequirementModalOpen(false)}>
-                  <FiPlus style={{ transform: "rotate(45deg)" }} />
-                </button>
-              </div>
-
-              <div className="modal-body">
-                {/* SECTION 1: BUSINESS REQUIREMENTS */}
-                <div className="form-section">
-                  <div className="section-head">
-                    <div className="section-icon-dot"></div>
-                    <h4>Section 1: Business Requirements</h4>
-                  </div>
-                  <div className="requirement-grid">
-                    <div className="field-group">
-                      <span className="req-field-label">Company / Business Name</span>
-                      <input className="req-input" value={requirementForm.business_name} onChange={e => updateReq("business_name", e.target.value)} placeholder="Enter company name" />
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Contact Person Name</span>
-                      <input className="req-input" value={requirementForm.contact_person} onChange={e => updateReq("contact_person", e.target.value)} placeholder="Enter contact name" />
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Email Address</span>
-                      <input className="req-input" value={requirementForm.email} onChange={e => updateReq("email", e.target.value)} placeholder="email@example.com" />
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Phone Number</span>
-                      <input className="req-input" value={requirementForm.phone} onChange={e => updateReq("phone", e.target.value)} placeholder="+1 234 567 890" />
-                    </div>
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Business Description</span>
-                      <textarea className="req-textarea" rows="3" value={requirementForm.business_desc} onChange={e => updateReq("business_desc", e.target.value)} placeholder="What does your company do?" />
-                    </div>
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Target Audience</span>
-                      <input className="req-input" value={requirementForm.target_audience} onChange={e => updateReq("target_audience", e.target.value)} placeholder="Who are your customers?" />
-                    </div>
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Purpose of Website</span>
-                      <div className="checkbox-group">
-                        {["Lead Generation", "E-commerce", "Portfolio", "Informational", "Other"].map(p => (
-                          <label key={p} className="checkbox-item">
-                            <input type="checkbox" className="ui-custom-checkbox mini" checked={requirementForm.purpose.includes(p)} onChange={() => togglePurpose(p)} />
-                            <span>{p}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 2: CONTENT REQUIREMENTS */}
-                <div className="form-section">
-                  <div className="section-head">
-                    <div className="section-icon-dot" style={{ background: "#4e94ff" }}></div>
-                    <h4>Section 2: Content Requirements</h4>
-                  </div>
-                  <div className="requirement-grid">
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Do you have content ready?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="content_ready" checked={requirementForm.content_ready === "yes"} onChange={() => updateReq("content_ready", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="content_ready" checked={requirementForm.content_ready === "no"} onChange={() => updateReq("content_ready", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Pages Required</span>
-                      <div className="checkbox-group">
-                        {["Home", "About Us", "Services", "Products", "Blog", "Contact", "Other"].map(page => (
-                          <label key={page} className="checkbox-item">
-                            <input type="checkbox" className="ui-custom-checkbox mini" checked={requirementForm.pages.includes(page)} onChange={() => togglePage(page)} />
-                            <span>{page}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Will you provide images/videos?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="provide_media" checked={requirementForm.provide_media === "yes"} onChange={() => updateReq("provide_media", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="provide_media" checked={requirementForm.provide_media === "no"} onChange={() => updateReq("provide_media", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Need content writing services?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="content_writing" checked={requirementForm.content_writing === "yes"} onChange={() => updateReq("content_writing", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="content_writing" checked={requirementForm.content_writing === "no"} onChange={() => updateReq("content_writing", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 3: DESIGN REQUIREMENTS */}
-                <div className="form-section">
-                  <div className="section-head">
-                    <div className="section-icon-dot" style={{ background: "#ed4b82" }}></div>
-                    <h4>Section 3: Design Requirements</h4>
-                  </div>
-                  <div className="requirement-grid">
-                    <div className="field-group">
-                      <span className="req-field-label">Preferred Color Theme</span>
-                      <input className="req-input" value={requirementForm.color_theme} onChange={e => updateReq("color_theme", e.target.value)} placeholder="e.g. Maroon & Gold" />
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Preferred Style</span>
-                      <select className="req-select" value={requirementForm.preferred_style} onChange={e => updateReq("preferred_style", e.target.value)}>
-                        <option>Modern</option>
-                        <option>Minimal</option>
-                        <option>Corporate</option>
-                        <option>Creative</option>
-                      </select>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Logo Availability</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="logo_avail" checked={requirementForm.logo_available === "yes"} onChange={() => updateReq("logo_available", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="logo_avail" checked={requirementForm.logo_available === "no"} onChange={() => updateReq("logo_available", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Need logo design?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="need_logo" checked={requirementForm.need_logo === "yes"} onChange={() => updateReq("need_logo", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="need_logo" checked={requirementForm.need_logo === "no"} onChange={() => updateReq("need_logo", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Any specific design instructions</span>
-                      <textarea className="req-textarea" rows="2" value={requirementForm.design_instructions} onChange={e => updateReq("design_instructions", e.target.value)} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 4: FUNCTIONAL REQUIREMENTS */}
-                <div className="form-section">
-                  <div className="section-head">
-                    <div className="section-icon-dot" style={{ background: "#8e44ad" }}></div>
-                    <h4>Section 4: Functional Requirements</h4>
-                  </div>
-                  <div className="requirement-grid">
-                    <div className="field-group full-width">
-                      <span className="req-field-label">Required Features</span>
-                      <div className="checkbox-group">
-                        {["Contact Form", "Login/Signup", "Payment Gateway", "Booking System", "Chat Integration", "Admin Panel", "Other"].map(f => (
-                          <label key={f} className="checkbox-item">
-                            <input type="checkbox" className="ui-custom-checkbox mini" checked={requirementForm.features.includes(f)} onChange={() => toggleFeature(f)} />
-                            <span>{f}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Social Media Integration?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="sm_int" checked={requirementForm.social_media === "yes"} onChange={() => updateReq("social_media", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="sm_int" checked={requirementForm.social_media === "no"} onChange={() => updateReq("social_media", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Newsletter Subscription?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="news_sub" checked={requirementForm.newsletter === "yes"} onChange={() => updateReq("newsletter", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="news_sub" checked={requirementForm.newsletter === "no"} onChange={() => updateReq("newsletter", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SECTION 5: TECHNICAL REQUIREMENTS */}
-                <div className="form-section">
-                  <div className="section-head">
-                    <div className="section-icon-dot" style={{ background: "#f39c12" }}></div>
-                    <h4>Section 5: Technical Requirements</h4>
-                  </div>
-                  <div className="requirement-grid">
-                    <div className="field-group">
-                      <span className="req-field-label">Domain Name Available?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="dom_avail" checked={requirementForm.domain_available === "yes"} onChange={() => updateReq("domain_available", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="dom_avail" checked={requirementForm.domain_available === "no"} onChange={() => updateReq("domain_available", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Hosting Available?</span>
-                      <div className="radio-group">
-                        <label className="checkbox-item"><input type="radio" name="host_avail" checked={requirementForm.hosting_available === "yes"} onChange={() => updateReq("hosting_available", "yes")} /> <span>Yes</span></label>
-                        <label className="checkbox-item"><input type="radio" name="host_avail" checked={requirementForm.hosting_available === "no"} onChange={() => updateReq("hosting_available", "no")} /> <span>No</span></label>
-                      </div>
-                    </div>
-                    <div className="field-group">
-                      <span className="req-field-label">Preferred Technology</span>
-                      <select className="req-select" value={requirementForm.technology} onChange={e => updateReq("technology", e.target.value)}>
         {isRequirementModalOpen && activeRequirementPkg && (
           <div className="modal-overlay" onClick={() => setIsRequirementModalOpen(false)}>
             <div className="modal-container" onClick={e => e.stopPropagation()}>
