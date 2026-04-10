@@ -187,24 +187,7 @@
   max-width: 420px;
 }
 
-.form-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
 
-.form-header h2 {
-  font-size: 2rem;
-  color: var(--primary-dark);
-  margin: 0 0 8px 0;
-  font-weight: 700;
-}
-
-.subtitle {
-  color: var(--text-dark);
-  opacity: 0.7;
-  margin: 0;
-  font-size: 1rem;
-}
 
 .login-form {
   background: var(--card-bg);

@@ -1,126 +1,228 @@
-/* ================= CONTAINER ================= */
-.lead-container {
-  max-width: 900px;
-  margin: 40px auto;
-  background: var(--card-bg);
-  padding: 32px 36px;
-  border-radius: 16px;
-  box-shadow: var(--shadow-medium);
+.add-lead-page {
+  padding: 12px 30px;
+  background: var(--design-bg);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  max-width: 1250px;
+  margin: 0 auto;
 }
 
-/* ================= HEADER ================= */
-.lead-container h2 {
-  color: var(--primary-dark);
-  margin-bottom: 28px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-/* ================= BACK BUTTON ================= */
-.back-btn {
-  display: inline-flex;
+/* Breadcrumbs */
+.breadcrumbs {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #d68910; /* Golden/Orange accent */
+  letter-spacing: 0.1em;
+  display: flex;
   align-items: center;
   gap: 6px;
-  background: transparent;
-  border: none;
-  background-color: var(--primary-dark);
-  color: var(--card-bg);
-  font-size: 14px;
-  cursor: pointer;
   margin-bottom: 12px;
 }
 
-.back-btn:hover {
-  color: var(--card-bg);
+.breadcrumbs span {
+  color: #8b7e74;
 }
 
-/* ================= FORM LAYOUT ================= */
-.lead-form {
+/* Form Card */
+.lead-form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px 40px 30px 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee0d5;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 15px;
+}
+
+.section-header-group {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f5ede6;
+  padding-bottom: 12px;
+}
+
+.section-main-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #5d2e32; /* Maroon */
+  margin-bottom: 4px;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: #8b7e74;
+}
+
+/* Secondary Section Titles */
+.section-secondary-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #5d2e32;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  border-left: 3px solid #d68910;
+  padding-left: 10px;
+  text-transform: uppercase;
+}
+
+.section-secondary-title.no-accent {
+    border-left: none;
+    padding-left: 0;
+    color: #8b7e74;
+    font-size: 0.7rem;
+}
+
+/* Form Grid */
+.form-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 12px 24px;
 }
 
-/* ================= FORM SECTIONS ================= */
-.left-form,
-.right-form {
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 24px;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+/* Form Fields */
+.form-field {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
-/* ================= INPUTS ================= */
-.lead-form input,
-.lead-form textarea {
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border-soft);
-  background: var(--input-bg);
-  color: var(--text-dark);
-  font-size: 14px;
-  margin-bottom: 12px;
-  transition: 0.2s ease;
+.form-field label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #8b7e74;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 2px;
 }
 
-.lead-form input::placeholder,
-.lead-form textarea::placeholder {
-  color: var(--text-muted-dark);
-}
-
-.lead-form input:focus,
-.lead-form textarea:focus {
+.form-field input, .form-field select, .form-field textarea {
+  background: #fdfcfb;
+  border: 1px solid #eee0d5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: #333;
   outline: none;
-  border-color: var(--primary-mid);
-  box-shadow: 0 0 0 2px rgba(122, 37, 48, 0.15);
+  transition: all 0.2s;
 }
 
-/* ================= TEXTAREA ================= */
-.lead-form textarea {
-  resize: none;
-  min-height: 90px;
+.form-field input::placeholder, .form-field textarea::placeholder {
+  color: #d0c8bf;
+  font-weight: 400;
 }
 
-/* ================= ADDRESS ================= */
-.address-row {
+.form-field input:focus, .form-field textarea:focus {
+  border-color: #d68910;
+  box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.05);
+}
+
+.form-field input:disabled {
+    background-color: #f9f6f3;
+    color: #a09890;
+    cursor: not-allowed;
+}
+
+/* Icons */
+.input-with-icon {
+  position: relative;
   display: flex;
-  gap: 12px;
+  align-items: center;
 }
 
-.address-row input {
-  flex: 1;
+.field-icon {
+  position: absolute;
+  left: 12px;
+  color: #8b7e74;
+  font-size: 0.9rem;
+  pointer-events: none;
 }
 
-/* ================= BUTTON ================= */
-.lead-form button {
+.input-with-icon input {
+  padding-left: 36px !important;
+  width: 100%;
+}
+
+/* Textarea */
+.form-field textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
   margin-top: 10px;
-  padding: 14px;
-  background: var(--btn-bg);
-  color: var(--white);
+}
+
+.cancel-btn {
+  background: none;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #5d2e32;
   cursor: pointer;
-  transition: 0.25s ease;
+  padding: 8px;
 }
 
-.lead-form button:hover {
-  background: var(--btn-hover);
-  transform: translateY(-1px);
+.submit-btn {
+  background: #5d2e32;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(93, 46, 50, 0.2);
 }
 
-/* ================= RESPONSIVE ================= */
+.submit-btn:hover {
+  background: #4a2428;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(93, 46, 50, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .form-grid-2, .form-grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .span-2 {
+    grid-column: span 1;
+  }
+}
+
 @media (max-width: 768px) {
-  .lead-form {
+  .form-grid-2, .form-grid-3 {
     grid-template-columns: 1fr;
   }
-
-  .address-row {
-    flex-direction: column;
+  .lead-form-card {
+    padding: 20px;
   }
-
-  .lead-container {
-    margin: 20px;
-    padding: 24px;
+  .add-lead-page {
+    padding: 10px 15px;
+  }
+  .section-main-title {
+    font-size: 1.6rem;
   }
 }

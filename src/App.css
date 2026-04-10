@@ -91,7 +91,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* Prevent horizontal scroll */
+  /* Keep sidebar/navbar stable */
   width: 100%;
 }
 
@@ -106,13 +106,16 @@ html {
   scrollbar-width: none !important;    /* Firefox */
 }
 
+/* Removed aggressive scrollbar hiding to prevent user confusion on scrolling content */
+/*
 ::-webkit-scrollbar {
-  display: none !important;            /* Chrome, Safari, Opera, Edge */
+  display: none !important;
 }
 
 *::-webkit-scrollbar {
   display: none !important;
 }
+*/
 
 ::selection {
   background-color: var(--primary-mid);

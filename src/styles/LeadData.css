@@ -26,26 +26,32 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .lead-detail-container .content {
   flex: 1;
-  padding: 16px; /* Reduced from 30px */
+  padding: 16px;
+  /* Reduced from 30px */
   background: transparent;
+  width: 100%;
 }
 
 /* SLEEK NAVIGATION GROUP (Integrated in Card Header) */
 .lead-navigation-sleek {
   display: flex;
   align-items: center;
-  gap: 10px; /* Reduced */
+  gap: 10px;
+  /* Reduced */
 }
 
 .lead-count-badge {
   background: white;
-  padding: 3px 8px; /* Reduced */
+  padding: 3px 8px;
+  /* Reduced */
   border-radius: 12px;
-  font-size: 0.7rem; /* Reduced */
+  font-size: 0.7rem;
+  /* Reduced */
   font-weight: 850;
   color: var(--primary-maroon);
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -54,14 +60,17 @@
 
 .nav-btn-group {
   display: flex;
-  gap: 4px; /* Reduced */
+  gap: 4px;
+  /* Reduced */
 }
 
 .nav-btn-sleek {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  width: 28px; /* Reduced */
-  height: 28px; /* Reduced */
+  width: 28px;
+  /* Reduced */
+  height: 28px;
+  /* Reduced */
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -92,7 +101,7 @@
 
 /* HEADER SECTION */
 .page-header {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto 40px auto;
 }
 
@@ -112,22 +121,26 @@
 .lead-main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px; /* Reduced from 24px */
-  max-width: 1400px;
-  margin: 0 auto;
+  gap: 16px;
+  /* Reduced from 24px */
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
 }
 
 .col-left,
 .col-right {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Reduced from 24px */
+  gap: 16px;
+  /* Reduced from 24px */
 }
 
 /* COMMON CARD STYLES */
 .ui-card {
   background: var(--card-white);
-  padding: 16px; /* Reduced from 24px */
+  padding: 16px;
+  /* Reduced from 24px */
   border-radius: 16px;
   box-shadow: var(--shadow-subtle);
   border: 1px solid rgba(0, 0, 0, 0.02);
@@ -140,7 +153,8 @@
   gap: 8px;
   font-size: 1rem;
   font-weight: 750;
-  margin-bottom: 16px; /* Reduced from 24px */
+  margin-bottom: 16px;
+  /* Reduced from 24px */
   color: #43121A;
 }
 
@@ -437,7 +451,7 @@
   background: var(--input-beige);
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid rgba(0, 0, 0, 0.02);
 }
 
 .summary-row {
@@ -579,7 +593,7 @@
   border-color: #5B0F1B;
 }
 
-.ui-custom-checkbox:checked::after {
+/* .ui-custom-checkbox:checked::after {
   content: '✓';
   position: absolute;
   color: white;
@@ -588,17 +602,40 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-weight: 900;
-}
+} */
 
 .ui-custom-checkbox.mini {
-  width: 15px;
-  height: 15px;
-  border-radius: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid #800020;
+  /* maroon border */
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-.ui-custom-checkbox.mini:checked::after {
-  font-size: 8px;
+/* Checked state */
+.ui-custom-checkbox.mini:checked {
+  background-color: #800020;
+  /* fill color */
+  border-color: #800020;
 }
+
+/* Tick mark */
+/* .ui-custom-checkbox.mini:checked::after {
+  content: "✔";
+  color: #fff;
+  font-size: 12px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  font-weight: bold;
+} */
 
 .package-item {
   display: flex;
@@ -663,8 +700,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-container {
@@ -681,8 +723,15 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal-header {
@@ -783,7 +832,9 @@
   letter-spacing: 0.5px;
 }
 
-.req-input, .req-textarea, .req-select {
+.req-input,
+.req-textarea,
+.req-select {
   width: 100%;
   background: var(--input-beige);
   border: 1px solid transparent;
@@ -795,7 +846,9 @@
   transition: all 0.2s;
 }
 
-.req-input:focus, .req-textarea:focus, .req-select:focus {
+.req-input:focus,
+.req-textarea:focus,
+.req-select:focus {
   background: white;
   border-color: var(--primary-maroon);
   outline: none;

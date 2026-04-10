@@ -3,10 +3,8 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
-import WebsiteRequirementForm from "../components/WebsiteRequirementForm";
-import SEORequirementForm from "../components/SEORequirementForm";
-import SMORequirementForm from "../components/SMORequirementForm";
 import "../styles/LeadData.css";
+import "../styles/DynamicForm.css";
 import { toast } from "react-toastify";
 import {
   FiChevronLeft,
@@ -24,8 +22,11 @@ import {
   FiMail,
   FiPhone,
   FiEdit2,
-  FiFileText
+  FiFileText,
+  FiArrowRight,
+  FiSave
 } from "react-icons/fi";
+import DynamicRequirementForm from "../components/DynamicRequirementForm";
 import { API_BASE_URL } from "../config.jsx";
 const STATUS_OPTIONS = [
   // CONNECT
@@ -109,11 +110,24 @@ export const LeadData = () => {
   const [taxPercentage, setTaxPercentage] = useState(18);
   const [discount, setDiscount] = useState(0);
   const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false);
-  const [activeRequirementPkg, setActiveRequirementPkg] = useState(null);
+  const [activeService, setActiveService] = useState(null);
+  const [serviceAreas, setServiceAreas] = useState([]);
 
   useEffect(() => {
     fetchPackages();
+    fetchServiceAreas();
   }, []);
+
+  const fetchServiceAreas = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/requirements/services/");
+      if (res.data?.status === "success") {
+        setServiceAreas(res.data.data || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch service areas", e);
+    }
+  };
 
   const fetchPackages = async () => {
     try {
@@ -370,6 +384,21 @@ export const LeadData = () => {
   const isUnassigned = lead.status === "unassigned";
   const { street, city, state, pincode } = lead.lead_address || {};
 
+  const hasBrandManagementSelected = selectedPackages.some(id => {
+    if (id.startsWith("pkg_")) {
+      const p = packages.find(pkg => pkg.id === parseInt(id.replace("pkg_", "")));
+      return p && p.package_name.toLowerCase().includes("brand management");
+    }
+    return false;
+  });
+
+  const filteredPackages = packages.filter(pkg => {
+    if (hasBrandManagementSelected) {
+      return pkg.package_name.toLowerCase().includes("brand management");
+    }
+    return true;
+  });
+
   return (
     <div className="lead-detail-container">
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -539,72 +568,138 @@ export const LeadData = () => {
 
               {/* CONVERTED SECTION (Moved into Left Column as requested) */}
               {/* SERVICE TYPE CARD - Always visible */}
-              <div className="ui-card" style={{ padding: "16px" }}>
-                <div style={{ marginBottom: "16px" }}>
-                  <h3 style={{ fontSize: "0.95rem", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><FiPackage /> Service Type</h3>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {packages.length > 0 ? (
-                    packages.map((pkg) => (
-                      <div key={pkg.id}>
-                        <div className="package-item" style={{ marginBottom: "2px", padding: "4px 8px" }} onClick={() => {
-                          const isChecked = selectedPackages.includes(`pkg_${pkg.id}`);
-                          if (!isChecked) {
-                            setSelectedPackages([...selectedPackages, `pkg_${pkg.id}`]);
-                          } else {
-                            const subIds = pkg.sub_packages ? pkg.sub_packages.map(s => `sub_${s.id}`) : [];
-                            setSelectedPackages(selectedPackages.filter(id => id !== `pkg_${pkg.id}` && !subIds.includes(id)));
-                          }
-                        }}>
-                          <input type="checkbox" className="ui-custom-checkbox" checked={selectedPackages.includes(`pkg_${pkg.id}`)} readOnly />
-                          <span className="package-name" style={{ fontSize: "0.85rem", color: selectedPackages.includes(`pkg_${pkg.id}`) ? "#5B0F1B" : "#333", fontWeight: selectedPackages.includes(`pkg_${pkg.id}`) ? "700" : "500" }}>{pkg.package_name}</span>
-                        </div>
-                        {pkg.sub_packages && pkg.sub_packages.length > 0 && selectedPackages.includes(`pkg_${pkg.id}`) && (
-                          <div style={{ marginLeft: "28px", borderLeft: "2px solid #f5f0e8", paddingLeft: "12px", marginTop: "4px", marginBottom: "8px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                            {pkg.sub_packages.map(sub => (
-                              <div key={sub.id} className="package-item" style={{ marginBottom: 0, padding: "3px 8px", borderRadius: "6px", background: selectedPackages.includes(`sub_${sub.id}`) ? "rgba(91, 15, 27, 0.03)" : "transparent" }} onClick={(e) => {
-                                e.stopPropagation();
-                                const isChecked = selectedPackages.includes(`sub_${sub.id}`);
-                                if (!isChecked) {
-                                  setSelectedPackages([...selectedPackages, `sub_${sub.id}`]);
-                                } else {
-                                  setSelectedPackages(selectedPackages.filter(id => id !== `sub_${sub.id}`));
-                                }
-                              }}>
-                                <input type="checkbox" className="ui-custom-checkbox mini" checked={selectedPackages.includes(`sub_${sub.id}`)} readOnly />
-                                <span className="package-name" style={{ fontSize: "0.8rem", color: selectedPackages.includes(`sub_${sub.id}`) ? "#5B0F1B" : "#666", fontWeight: selectedPackages.includes(`sub_${sub.id}`) ? "650" : "400" }}>{sub.sub_package_name} - ${sub.amount}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <p style={{ fontSize: "0.8rem" }}>No packages found.</p>
-                  )}
-                </div>
+              {phones.some(p => p.status === "converted") && (
+                <div className="ui-card" style={{ padding: "16px" }}>
+                  <div style={{ marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "0.95rem", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><FiPackage /> Service Type</h3>
+                  </div>
 
-                {/* Requirement Form Buttons - one per selected package with a form type */}
-                {(() => {
-                  const pkgsWithForms = selectedPackages
-                    .filter(id => id.startsWith("pkg_"))
-                    .map(id => packages.find(p => p.id === parseInt(id.replace("pkg_", ""))))
-                    .filter(p => p?.requirement_form_type);
-                  if (pkgsWithForms.length === 0) return null;
-                  return (
-                    <div style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px", borderTop: "1px solid #f5eee0", paddingTop: "12px" }}>
-                      {pkgsWithForms.map(pkg => (
-                        <button key={pkg.id} className="btn-requirement" onClick={() => {
-                          setActiveRequirementPkg(pkg);
-                          setIsRequirementModalOpen(true);
-                        }}>
-                          <FiFileText /> {pkg.package_name} Form
-                        </button>
-                      ))}
+                  <div style={{ display: "flex", gap: "24px" }}>
+                    {/* Left Side: Checkboxes */}
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                      {filteredPackages.length > 0 ? (
+                        filteredPackages.map((pkg) => (
+                          <div key={pkg.id}>
+                            <div className="package-item" style={{ marginBottom: "2px", padding: "4px 8px" }} onClick={() => {
+                              const isChecked = selectedPackages.includes(`pkg_${pkg.id}`);
+                              if (!isChecked) {
+                                if (pkg.package_name.toLowerCase().includes("brand management")) {
+                                  setSelectedPackages([`pkg_${pkg.id}`]);
+                                } else {
+                                  setSelectedPackages([...selectedPackages, `pkg_${pkg.id}`]);
+                                }
+                              } else {
+                                const subIds = pkg.sub_packages ? pkg.sub_packages.map(s => `sub_${s.id}`) : [];
+                                setSelectedPackages(selectedPackages.filter(id => id !== `pkg_${pkg.id}` && !subIds.includes(id)));
+                              }
+                            }}>
+                              <input type="checkbox" className="ui-custom-checkbox" checked={selectedPackages.includes(`pkg_${pkg.id}`)} readOnly />
+                              <span className="package-name" style={{ fontSize: "0.85rem", color: selectedPackages.includes(`pkg_${pkg.id}`) ? "#800000" : "#333", fontWeight: selectedPackages.includes(`pkg_${pkg.id}`) ? "700" : "500" }}>{pkg.package_name}</span>
+                            </div>
+                            {pkg.sub_packages && pkg.sub_packages.length > 0 && selectedPackages.includes(`pkg_${pkg.id}`) && (
+                              <div style={{ marginLeft: "28px", borderLeft: "2px solid #f5f0e8", paddingLeft: "12px", marginTop: "4px", marginBottom: "8px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                                {pkg.sub_packages.map(sub => (
+                                  <div key={sub.id} className="package-item" style={{ marginBottom: 0, padding: "3px 8px", borderRadius: "6px" }} onClick={(e) => {
+                                    e.stopPropagation();
+                                    const isChecked = selectedPackages.includes(`sub_${sub.id}`);
+                                    if (!isChecked) {
+                                      setSelectedPackages([...selectedPackages, `sub_${sub.id}`]);
+                                    } else {
+                                      setSelectedPackages(selectedPackages.filter(id => id !== `sub_${sub.id}`));
+                                    }
+                                  }}>
+                                    <input type="checkbox" className="ui-custom-checkbox mini" checked={selectedPackages.includes(`sub_${sub.id}`)} readOnly />
+                                    <span className="package-name" style={{ fontSize: "0.8rem", color: selectedPackages.includes(`sub_${sub.id}`) ? "#800000" : "#666" }}>{sub.sub_package_name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p style={{ fontSize: "0.8rem" }}>No packages found.</p>
+                      )}
                     </div>
-                  );
-                })()}
-              </div>
+
+                    {/* Right Side: Active Requirements Buttons */}
+                    <div style={{ flex: 1, borderLeft: "1px solid #f5eee0", paddingLeft: "24px" }}>
+                      <span className="field-label" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", display: "block", color: "#888" }}>Required Documentation</span>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        {(() => {
+                          const activeRequirementForms = [];
+                          selectedPackages.forEach(id => {
+                            if (id.startsWith("pkg_")) {
+                              const pkg = packages.find(p => p.id === parseInt(id.replace("pkg_", "")));
+                              if (pkg) {
+                                let searchNames = [pkg.package_name.toLowerCase()];
+
+                                // Map Digital Marketing to both SEO and SMO
+                                if (searchNames[0].includes("digital marketing")) {
+                                  searchNames = ["seo", "smo"];
+                                } else if (searchNames[0].includes("seo")) {
+                                  searchNames = ["seo"];
+                                } else if (searchNames[0].includes("smo")) {
+                                  searchNames = ["smo"];
+                                } else if (searchNames[0].includes("content management")) {
+                                  searchNames = ["content management"];
+                                } else if (searchNames[0].includes("website development")) {
+                                  searchNames = ["website development"];
+                                } else if (searchNames[0].includes("brand management")) {
+                                  searchNames = ["brand management"];
+                                }
+
+                                searchNames.forEach(sName => {
+                                  const match = (serviceAreas || []).find(s =>
+                                    s.name.toLowerCase() === sName ||
+                                    s.name.toLowerCase().includes(sName)
+                                  );
+
+                                  if (match && !activeRequirementForms.find(f => f.id === match.id)) {
+                                    activeRequirementForms.push(match);
+                                  }
+                                });
+                              }
+                            }
+                          });
+
+                          // Fetch global Business Requirements form
+                          const businessReqForm = (serviceAreas || []).find(s => s.name.toLowerCase() === "business requirements");
+
+                          // Filter: If Brand Management is present, show ONLY Brand Management
+                          const brandManagement = activeRequirementForms.find(f =>
+                            f.name.toLowerCase().includes("brand management")
+                          );
+
+                          let finalForms = brandManagement ? [brandManagement] : activeRequirementForms;
+
+                          if (finalForms.length === 0) {
+                            return <p style={{ fontSize: "0.8rem", color: "#999", fontStyle: "italic" }}>Select a service type to see requirements.</p>;
+                          }
+
+                          // Always include Business Requirements first
+                          if (businessReqForm && !finalForms.find(f => f.id === businessReqForm.id)) {
+                            finalForms = [businessReqForm, ...finalForms];
+                          }
+
+                          return finalForms.map(service => (
+                            <button
+                              key={service.id}
+                              className="btn-requirement-sleek"
+                              style={{ width: "100%", justifyContent: "space-between" }}
+                              onClick={() => {
+                                navigate(`/requirements/${service.id}/${id}`);
+                              }}
+                            >
+                              <span>Fill {service.name} Details</span>
+                              <FiArrowRight />
+                            </button>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="col-right">
               {/* COMMUNICATION CARD (Switched position for balance) */}
@@ -892,48 +987,16 @@ export const LeadData = () => {
             </div>
           </div>
         </div>
-        {/* REQUIREMENT MODAL */}
-        {isRequirementModalOpen && activeRequirementPkg && (
-          <div className="modal-overlay" onClick={() => setIsRequirementModalOpen(false)}>
-            <div className="modal-container" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2><FiFileText /> {activeRequirementPkg.package_name} Requirements</h2>
-                <button className="close-modal-btn" onClick={() => setIsRequirementModalOpen(false)}>
-                  <FiPlus style={{ transform: "rotate(45deg)" }} />
-                </button>
-              </div>
-              <div className="modal-body">
-                {activeRequirementPkg.requirement_form_type === "website" ? (
-                  <WebsiteRequirementForm
-                    leadId={id}
-                    packageId={activeRequirementPkg.id}
-                    lead={lead}
-                    onClose={() => setIsRequirementModalOpen(false)}
-                  />
-                ) : activeRequirementPkg.requirement_form_type === "seo" ? (
-                  <SEORequirementForm
-                    leadId={id}
-                    packageId={activeRequirementPkg.id}
-                    lead={lead}
-                    onClose={() => setIsRequirementModalOpen(false)}
-                  />
-                ) : activeRequirementPkg.requirement_form_type === "smo" ? (
-                  <SMORequirementForm
-                    leadId={id}
-                    packageId={activeRequirementPkg.id}
-                    lead={lead}
-                    onClose={() => setIsRequirementModalOpen(false)}
-                  />
-                ) : (
-                  <div style={{ padding: "40px", textAlign: "center" }}>
-                    <FiFileText size={48} style={{ opacity: 0.2, marginBottom: "20px" }} />
-                    <h3>Coming Soon</h3>
-                    <p>The requirement form for {activeRequirementPkg.package_name} is under development.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* DYNAMIC REQUIREMENT MODAL */}
+        {isRequirementModalOpen && activeService && (
+          <DynamicRequirementForm
+            serviceId={activeService.id}
+            leadId={id}
+            onClose={() => setIsRequirementModalOpen(false)}
+            onSuccess={() => {
+              toast.success(`${activeService.name} requirements saved!`);
+            }}
+          />
         )}
       </main>
     </div>

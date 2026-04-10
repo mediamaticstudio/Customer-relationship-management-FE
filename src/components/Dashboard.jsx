@@ -33,6 +33,7 @@ import Navbar from "./Navbar";
 import "../styles/Dashboard.css";
 import { API_BASE_URL } from "../config.jsx";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // Register ChartJS components
 ChartJS.register(
@@ -57,16 +58,29 @@ const Dashboard = () => {
     const [trendData, setTrendData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeView, setActiveView] = useState('trend'); // 'trend', 'graph', 'count'
+    const navigate = useNavigate();
+
+    // Helper to format date as YYYY-MM-DD in local time
+    const formatDate = (date) => {
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     // Fetch Analytics Data
-    const fetchAnalytics = async () => {
+    const fetchAnalytics = async (isManual = false) => {
         setLoading(true);
         try {
-            const startStr = startDate.toISOString().split('T')[0];
-            const endStr = endDate.toISOString().split('T')[0];
+            const startStr = formatDate(startDate);
+            const endStr = formatDate(endDate);
+
+            // Add cache busting timestamp for manual refresh
+            const url = `${API_BASE_URL}/dashboard/details/?start_date=${startStr}&end_date=${endStr}&period=${timePeriod}${isManual ? `&t=${Date.now()}` : ""}`;
 
             const response = await fetch(
-                `${API_BASE_URL}/dashboard/details/?start_date=${startStr}&end_date=${endStr}&period=${timePeriod}`,
+                url,
                 {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("access")}`
@@ -82,25 +96,41 @@ const Dashboard = () => {
             // Combine summary total with individual bucket counts
             const mappedBuckets = {
                 total: rawData.summary.total_leads,
+                lifetime: rawData.summary.total_leads_lifetime,
                 activity: rawData.summary.total_activity,
                 ...rawData.bucket_counts
             };
 
             setBucketData(mappedBuckets);
             setTrendData(rawData.trends || []);
+
+            if (isManual) {
+                toast.success("Dashboard data refreshed!");
+            }
         } catch (error) {
             console.error("Analytics Error:", error);
+            toast.error("Failed to refresh dashboard data");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchAnalytics();
+        fetchAnalytics(false);
     }, [startDate, endDate, timePeriod]);
 
     const handleRefresh = () => {
-        fetchAnalytics();
+        const today = new Date();
+        if (formatDate(startDate) === formatDate(today) && formatDate(endDate) === formatDate(today)) {
+            // If already today, just trigger a manual re-fetch
+            fetchAnalytics(true);
+        } else {
+            // Setting these will trigger the useEffect to fetch data
+            setStartDate(today);
+            setEndDate(today);
+            // We show a slightly different message here
+            toast.info("Dashboard reset to today");
+        }
     };
 
     // Chart Data Preparation Helpers
@@ -204,8 +234,13 @@ const Dashboard = () => {
                                 </select>
                             </div>
 
-                            <button className="refresh-icon-btn" onClick={handleRefresh} disabled={loading}>
-                                {loading ? "..." : <FiRefreshCw />}
+                            <button
+                                className={`refresh-icon-btn ${loading ? 'spinning' : ''}`}
+                                onClick={handleRefresh}
+                                disabled={loading}
+                                title="Refresh Data"
+                            >
+                                <FiRefreshCw />
                             </button>
                         </div>
                     </div>
@@ -213,17 +248,17 @@ const Dashboard = () => {
 
                 {/* Summary Cards Grid */}
                 <section className="summary-cards">
-                    <div className="summary-card">
+                    <div className="summary-card clickable" onClick={() => navigate('/import-history')} style={{ cursor: 'pointer' }}>
                         <div className="card-top-row">
                             <div className="card-title-group">
                                 <div className="card-icon" style={{ background: '#fff5f5', color: '#ff4d4f' }}>
-                                    <FiTrendingUp />
+                                    <FiBriefcase />
                                 </div>
-                                <h3>TOTAL ATTENDED</h3>
+                                <h3>TOTAL LEADS</h3>
                             </div>
-                            <p className="card-value">{bucketData.activity || 0}</p>
+                            <p className="card-value">{loading ? "..." : (bucketData.lifetime || 0)}</p>
                         </div>
-                        <span className="card-subtitle">In selected period</span>
+                        <span className="card-subtitle">Lifetime leads (Click for details)</span>
                     </div>
 
                     <div className="summary-card">
@@ -339,17 +374,16 @@ const Dashboard = () => {
                                                     maxRotation: 45,
                                                     minRotation: 45,
                                                     font: { size: 10, weight: '600' },
-                                                    autoSkip: false
+                                                    autoSkip: true,
+                                                    maxTicksLimit: 15
                                                 }
                                             },
                                             y: {
-                                                min: -1.0,
-                                                max: 1.0,
+                                                beginAtZero: true,
                                                 grid: { color: '#f0f0f0' },
                                                 ticks: {
-                                                    stepSize: 0.2,
                                                     font: { size: 10 },
-                                                    callback: (value) => value.toFixed(1)
+                                                    callback: (value) => Math.round(value)
                                                 }
                                             }
                                         }
@@ -444,8 +478,8 @@ const Dashboard = () => {
                                                     beginAtZero: true,
                                                     grid: { color: '#f0f0f0' },
                                                     ticks: {
-                                                        stepSize: 0.1,
-                                                        font: { size: 10 }
+                                                        font: { size: 10 },
+                                                        callback: (value) => Math.round(value)
                                                     }
                                                 }
                                             }

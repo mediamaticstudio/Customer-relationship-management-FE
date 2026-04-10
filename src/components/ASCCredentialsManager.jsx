@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Sidebar } from "./Sidebar";
+import { Navbar } from "./Navbar";
 import { FiX, FiMenu, FiTrash2, FiPlus, FiLock, FiUser, FiHash, FiClock, FiShield } from "react-icons/fi";
 import { API_BASE_URL } from "../config.jsx";
 import { toast } from "react-toastify";
@@ -83,6 +84,8 @@ export default function ASCCredentialsManager() {
       </aside>
 
       <main className="main-panel">
+        <Navbar pageTitle="ASC Credentials" subTitle="Secure login management for Authorized Service Centers" />
+        
         <div className="asc-manager-container">
           <header className="asc-manager-header">
             <div>
@@ -142,7 +145,6 @@ export default function ASCCredentialsManager() {
                 <tr>
                   <th><FiHash size={14} style={{ marginRight: 6 }} /> ASC Code</th>
                   <th><FiUser size={14} style={{ marginRight: 6 }} /> Login ID</th>
-                  {/* <th><FiLock size={14} style={{ marginRight: 6 }} /> Password</th> */}
                   <th><FiClock size={14} style={{ marginRight: 6 }} /> Created At</th>
                   <th style={{ textAlign: 'center' }}>Actions</th>
                 </tr>
@@ -161,7 +163,6 @@ export default function ASCCredentialsManager() {
                     <tr key={cred.id}>
                       <td><span className="asc-badge">{cred.asc_code}</span></td>
                       <td><strong>{cred.username}</strong></td>
-                      {/* <td><code className="password-code">{cred.password}</code></td> */}
                       <td style={{ color: 'var(--text-muted-dark)', fontSize: '0.85rem' }}>{cred.created_at}</td>
                       <td>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>

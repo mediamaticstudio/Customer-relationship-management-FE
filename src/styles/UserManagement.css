@@ -71,7 +71,36 @@ body {
 .add-user:hover {
   background-color: var(--btn-hover);
 }
+.search-container {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
 
+}
+.search-container .search-bar {
+  padding: 8px;
+  border: 1px solid var(--border-soft);
+  background-color: var(--input-bg);
+  border-radius: 8px;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 350px;
+}
+.search-bar input {
+  border: none;
+  background: transparent;
+  width: 200px;
+  color: var(--text-dark);
+  outline: none;
+}
+.search-bar:focus-within {
+  border-color: var(--primary-mid);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
 .filters {
   display: flex;
   gap: 10px;

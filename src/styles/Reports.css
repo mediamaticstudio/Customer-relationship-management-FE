@@ -10,55 +10,161 @@
 
 .reports-main {
     flex: 1;
-    padding: 0;
-    transition: margin-left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: calc(100vw - 260px);
+    overflow: hidden; /* Lock the viewport */
+    position: relative;
+    height: 100vh;
+}
+
+.reports-scrollable-area {
+    flex: 1;
+    overflow: auto;
+    width: 100%;
 }
 
 /* ================================
    REPORTS COMMAND BAR (Tabs & Actions)
 ================================ */
 .reports-header {
-    margin-bottom: 24px;
-    padding: 32px 32px 0 32px;
+    margin-bottom: 12px;
+    padding: 16px 24px 0 24px;
     border: none;
 }
 
 .tabs-navigation {
     display: flex;
     justify-content: space-between;
-    /* Tabs left, actions right */
     align-items: center;
-    background: var(--card-bg);
-    padding: 6px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background: transparent;
+    padding: 0;
+    gap: 15px;
+    border-bottom: 2px solid var(--border-soft);
+    margin-top: 10px;
     overflow: visible;
-    flex-wrap: wrap;
-    gap: 12px;
+}
+
+.tabs-scroll-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    gap: 5px;
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: -2px; /* Align with parent border */
+}
+
+.scroll-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background: #fff;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    z-index: 5;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.scroll-btn:hover:not(:disabled) {
+    background: var(--primary-dark);
+    color: #fff;
+    border-color: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.scroll-btn:disabled {
+    opacity: 0.3;
+    background: #f8f9fa;
+    color: var(--text-muted-dark);
+    border-color: var(--border-soft);
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .tabs-group {
     display: flex;
-    gap: 4px;
-    align-items: center;
+    gap: 5px;
+    align-items: flex-end;
     overflow-x: auto;
-    /* Allow horizontal scroll on mobile if needed */
     scrollbar-width: none;
-    /* Hide scrollbar */
-    padding-right: 10px;
+    -ms-overflow-style: none;
+    flex: 1;
+    flex-wrap: nowrap;
+    min-width: 0;
+    padding: 0 5px;
 }
 
 .tabs-group::-webkit-scrollbar {
     display: none;
+    /* Hide scrollbar for Chrome/Safari */
+}
+
+.tab-btn-premium {
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--text-muted-dark);
+    border: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tab-icon {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.tab-btn-premium:hover {
+    color: var(--primary-dark);
+}
+
+.tab-btn-premium:hover .tab-icon {
+    opacity: 1;
+}
+
+.tab-btn-premium.active {
+    color: var(--primary-dark);
+    font-weight: 700;
+}
+
+.tab-btn-premium.active .tab-icon {
+    opacity: 1;
+}
+
+.tab-btn-premium.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--primary-dark);
+    border-radius: 4px 4px 0 0;
 }
 
 .report-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
-    padding-right: 6px;
-    flex-shrink: 0;
-    /* Prevent shrinking */
+    padding-bottom: 8px;
 }
 
 .export-btn,
@@ -76,9 +182,7 @@
 
 .export-btn {
     background: var(--primary-dark);
-    /* Primary Maroon */
-    color: var(--card-bg);
-    /* Text color on dark background */
+    color: var(--white);
     border: none;
 }
 
@@ -96,44 +200,6 @@
 .print-btn:hover {
     background: var(--input-bg);
     transform: translateY(-1px);
-}
-
-.tab-btn {
-    padding: 10px 16px;
-    background: transparent;
-    color: var(--text-dark);
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    position: relative;
-}
-
-.tab-btn:hover {
-    background: var(--border-soft);
-    color: var(--primary-dark);
-}
-
-.tab-btn.active {
-    background: var(--primary-dark);
-    color: var(--white);
-    /* Ensure contrast */
-}
-
-.tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid var(--primary-dark);
 }
 
 /* ================================
@@ -381,12 +447,10 @@
 .report-table {
     width: 100%;
     border-collapse: separate;
-    /* Changed for border-radius support */
     border-spacing: 0;
     margin-top: 16px;
     font-size: 0.9rem;
-    /* Increased from 0.82rem for clarity */
-    min-width: 800px;
+    min-width: 0;
 }
 
 .report-table thead {
@@ -670,4 +734,25 @@
 
 .action-btn svg {
     font-size: 1.1rem;
+}
+
+/* Progress Bar Visuals */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    display: block;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.6s ease;
+    border-radius: 4px;
+    background: var(--primary-dark) !important;
+}
+
+.report-table td {
+    vertical-align: middle;
 }

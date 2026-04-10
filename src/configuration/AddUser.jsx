@@ -2,20 +2,22 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/AddUser.css";
 import { useNavigate } from "react-router-dom";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { 
+  FiEdit, 
+  FiTrash2, 
+  FiUserPlus, 
+  FiFilter, 
+  FiDownload,
+  FiChevronLeft,
+  FiChevronRight
+} from "react-icons/fi";
 import { toast } from "react-toastify";
 
 import { API_BASE_URL } from "../config.jsx";
-import Dashboard from "../components/Dashboard.jsx";
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 
 const API = `${API_BASE_URL}/configurations/users/`;
-const ROLE_OPTIONS = [
-  { value: "ADMIN", label: "Admin" },
-  { value: "SUPERVISOR", label: "Supervisor" },
-  { value: "AGENT", label: "Agent" },
-  { value: "CLIENT", label: "Client" },
-];
-
 
 export default function AddUser() {
   const LOGGED_IN_ROLE = (localStorage.getItem("role") || "").toUpperCase();
@@ -33,16 +35,12 @@ export default function AddUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [nextPage, setNextPage] = useState(null);
   const [prevPage, setPrevPage] = useState(null);
+  const [count, setCount] = useState(0);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [actionType, setActionType] = useState(null); // "edit" | "delete"
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
-  const dashboard = false;
-
-
-  const [count, setCount] = useState(0);
   const [form, setForm] = useState({
     asc_name: "",
     email: "",
@@ -53,7 +51,6 @@ export default function AddUser() {
     asc_code: LOGGED_IN_ASC_CODE || "",
     asc_location: LOGGED_IN_ASC_LOCATION || "",
   });
-
 
   // ================= FETCH USERS =================
   const fetchUsers = async (page = 1) => {
@@ -69,72 +66,47 @@ export default function AddUser() {
     }
   };
 
-
   useEffect(() => {
-    // Redirect if not authorized (MediaMatic Studio or ASC Management - assuming Admin covers both for now)
-    // If strict matrix: Supervisor (2) and Agent (3) cannot create users.
     if (!IS_ADMINS) {
       toast.error("Unauthorized access: Only Admins can create users.");
       navigate("/dashboard");
       return;
     }
-
-
     fetchUsers(1);
   }, [navigate, LOGGED_IN_ROLE]);
 
-  // ================= HANDLE INPUT =================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ================= SUBMIT FORM =================
   const submitForm = async () => {
     try {
-      // ================= ROLE FLAGS =================
-      const IS_SUPERADMIN = LOGGED_IN_ROLE === "SUPERADMIN";
-      const IS_ADMIN = LOGGED_IN_ROLE === "ADMIN";
-
-      // ================= BASIC VALIDATION =================
       if (!form.asc_name || !form.email || !form.role) {
         toast.error("Name, Email and Role are required");
         return;
       }
 
-      // ================= PASSWORD VALIDATION =================
       if (!editId) {
-        // Create user
         if (!form.password || !form.confirmPassword) {
           toast.error("Password and Confirm Password are required");
           return;
         }
-
         if (form.password !== form.confirmPassword) {
           toast.error("Passwords do not match");
           return;
         }
       } else {
-        // Edit user
-        if (form.password) {
-          if (!form.confirmPassword) {
-            toast.error("Please confirm your password");
-            return;
-          }
-
-          if (form.password !== form.confirmPassword) {
-            toast.error("Passwords do not match");
-            return;
-          }
+        if (form.password && form.password !== form.confirmPassword) {
+          toast.error("Passwords do not match");
+          return;
         }
       }
 
-      // ================= ROLE PERMISSION CHECK =================
       if (IS_ADMIN && ["SUPERADMIN", "ADMIN"].includes(form.role)) {
         toast.error("Admins cannot create or edit this role");
         return;
       }
 
-      // ================= BUILD PAYLOAD =================
       const payload = {
         asc_name: form.asc_name,
         email: form.email,
@@ -145,14 +117,11 @@ export default function AddUser() {
         created_by: LOGGED_IN_USER_ID,
       };
 
-      // ================= PASSWORD PAYLOAD =================
       if (form.password) {
         payload.password = form.password;
       }
 
-      // ================= API CALL =================
       let res;
-
       if (editId) {
         res = await axios.put(`${API}${editId}/`, payload);
         toast.success(res.data?.message || "User updated successfully");
@@ -161,7 +130,6 @@ export default function AddUser() {
         toast.success(res.data?.message || "User created successfully");
       }
 
-      // ================= RESET FORM =================
       setForm({
         asc_name: "",
         email: "",
@@ -181,11 +149,7 @@ export default function AddUser() {
     }
   }
 
-
-
-  // ================= EDIT USER =================
   const editUser = (user) => {
-    // ADMIN cannot edit SUPERADMIN / ADMIN
     if (IS_ADMIN && ["SUPERADMIN", "ADMIN"].includes(user.role)) {
       toast.error("You are not allowed to edit this user");
       return;
@@ -206,265 +170,193 @@ export default function AddUser() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const deleteUser = async (id) => {
+    try {
+      await axios.delete(`${API}${id}/`);
+      toast.success("User deleted successfully");
+      fetchUsers();
+    } catch (error) {
+      toast.error("Delete failed");
+    }
+  };
+
   const openConfirmModal = (type, user) => {
     setActionType(type);
     setSelectedUser(user);
     setIsConfirmOpen(true);
   };
 
-  const closeConfirmModal = () => {
-    setIsConfirmOpen(false);
-    setActionType(null);
-    setSelectedUser(null);
-  };
-
-  // ================= DELETE USER =================
-  const deleteUser = async (id) => {
-    if (!window.confirm("Delete this user?")) return;
-
-    try {
-      await axios.delete(`${API}${id}/`);
-      toast.success("User deleted successfully");
-      fetchUsers();
-    } catch (error) {
-      toast.error("Delete failed", error);
-    }
-  };
-
   const handleConfirmAction = () => {
-    if (actionType === "edit") {
-      editUser(selectedUser);
-    }
-
     if (actionType === "delete") {
       deleteUser(selectedUser.id);
     }
-
-    closeConfirmModal();
-  };
-  const handleSubmitClick = () => {
-    // Ask only when editing
-    if (editId) {
-      setShowSubmitConfirm(true);
-    } else {
-      submitForm(); // create user → no confirmation
-    }
+    setIsConfirmOpen(false);
   };
 
+  const getInitials = (name) => {
+    return name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
+  };
 
-  // ================= JSX =================
+  const getBadgeClass = (role) => {
+    role = role?.toUpperCase() || "";
+    if (role === "ADMIN" || role === "SUPERADMIN") return "badge-admin";
+    if (role === "SUPERVISOR") return "badge-manager";
+    if (role === "AGENT") return "badge-employee";
+    return "badge-employee";
+  };
+
   return (
-    <div className="add-user-page">
-      <button className="back-btn" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+    <div className="analytics-dashboard">
+      <aside className="sidebar-container">
+        <Sidebar />
+      </aside>
 
-      <div className="add-user-card">
-        <h2>Login Users</h2>
+      <main className="analytics-main">
+        <Navbar />
+        
+        <div className="add-user-page">
+          {/* Page Title */}
+          <header className="page-title-section">
+            <h1>Add Users</h1>
+            {/* <p>Register new administrative or team members to the HRMS portal.</p> */}
+          </header>
 
-        <div className="user-form">
-          <input
-            name="asc_name"
-            placeholder="Name"
-            value={form.asc_name}
-            onChange={handleChange}
-            required
-          />
+          {/* Form Card */}
+          <section className="form-card">
+            <div className="form-grid">
+              <div className="form-field">
+                <label>Full Name</label>
+                <input name="asc_name" placeholder="John Doe" value={form.asc_name} onChange={handleChange} />
+              </div>
+              <div className="form-field">
+                <label>Email Address</label>
+                <input name="email" placeholder="john.doe@company.com" value={form.email} onChange={handleChange} />
+              </div>
+              <div className="form-field">
+                <label>Phone Number</label>
+                <input name="phone_no" placeholder="+91 98765 43210" value={form.phone_no} onChange={handleChange} />
+              </div>
+              <div className="form-field">
+                <label>Employee ID</label>
+                <input name="asc_code" placeholder="EMP-2024-001" value={form.asc_code} onChange={handleChange} disabled={!IS_SUPERADMIN} />
+              </div>
+              <div className="form-field">
+                <label>Location</label>
+                <input name="asc_location" placeholder="e.g. Trichy" value={form.asc_location} onChange={handleChange} disabled={!IS_SUPERADMIN} />
+              </div>
+              <div className="form-field">
+                <label>User Role</label>
+                <select name="role" value={form.role} onChange={handleChange}>
+                  <option value="">Select Role</option>
+                  {IS_SUPERADMIN && <option value="ADMIN">Admin</option>}
+                  {(IS_SUPERADMIN || IS_ADMIN) && (
+                    <>
+                      <option value="SUPERVISOR">Supervisor</option>
+                      <option value="AGENT">Agent</option>
+                    </>
+                  )}
+                </select>
+              </div>
+              <div className="form-field">
+                <label>Password</label>
+                <input name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} />
+              </div>
+              <div className="form-field">
+                <label>Confirm Password</label>
+                <input name="confirmPassword" type="password" placeholder="••••••••" value={form.confirmPassword} onChange={handleChange} />
+              </div>
+            </div>
+            <div className="create-btn-container">
+              <button className="create-user-btn" onClick={submitForm}>
+                <FiUserPlus /> {editId ? "Update User" : "Create User"}
+              </button>
+            </div>
+          </section>
 
-          <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
-          <input
-            name="phone_no"
-            placeholder="Phone"
-            value={form.phone_no}
-            onChange={handleChange}
-            required
-            type="tel"
-            inputMode="numeric"
-            pattern="[0-9]{10}"
-            maxLength={10}
-          />
+          {/* User Directory Card */}
+          <section className="directory-card">
+            <div className="directory-header">
+              <h2>User Directory</h2>
+              <div className="directory-actions">
+                <button className="icon-button"><FiFilter /></button>
+                <button className="icon-button"><FiDownload /></button>
+              </div>
+            </div>
 
-          <input
-            name="asc_code"
-            placeholder="ASC Code"
-            value={form.asc_code}
-            onChange={handleChange}
-            disabled={!IS_SUPERADMIN}
-          />
-
-          <input
-            name="asc_location"
-            placeholder="ASC Location"
-            value={form.asc_location}
-            onChange={handleChange}
-            disabled={!IS_SUPERADMIN}
-          />
-
-
-          <input
-            name="password"
-            type="password"
-            placeholder={editId ? "Leave blank to keep password" : "Password"}
-            value={form.password}
-            onChange={handleChange}
-            required={!editId}
-          />
-          <input
-            name="confirmPassword"
-            type="password"
-            placeholder={editId ? "Leave blank to keep password" : "Confirm Password"}
-            value={form.confirmPassword}
-            onChange={handleChange}
-            required={!editId}
-          />
-
-
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Role</option>
-
-            {IS_SUPERADMIN && (
-              <>
-                <option value="ADMIN">Admin</option>
-              </>
-            )}
-
-            {(IS_SUPERADMIN || IS_ADMIN) && (
-              <>
-                <option value="SUPERVISOR">Supervisor</option>
-                <option value="AGENT">Agent</option>
-              </>
-            )}
-          </select>
-
-
-          <button onClick={handleSubmitClick}>
-            {editId ? "Update User" : "Create User"}
-          </button>
-        </div>
-
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone No</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length > 0 ? (
-              users.map((u) => (
-                <tr key={u.id}>
-                  <td data-label="Name">{u.asc_name}</td>
-                  <td data-label="Phone No">{u.phone_no}</td>
-                  <td data-label="Email">{u.email}</td>
-                  <td data-label="Role">{u.role?.name || u.role}</td>
-                  <td data-label="Edit">
-                    <button
-                      className="action-btn edit"
-                      onClick={() => editUser(u)}
-                    >
-                      <FiEdit />
-                    </button>
-
-                  </td>
-                  <td data-label="Delete">
-                    <button
-                      className="action-btn delete"
-                      onClick={() => openConfirmModal("delete", u)}
-                    >
-                      <FiTrash2 />
-                    </button>
-
-                  </td>
+            <table className="user-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone No</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" style={{ textAlign: "center" }}>
-                  No users found
-                </td>
-              </tr>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map((u) => (
+                    <tr key={u.id}>
+                      <td>
+                        <div className="user-name-cell">
+                          <div className="user-avatar-circle" style={{ backgroundColor: `#${Math.floor(Math.random()*16777215).toString(16)}22`, color: '#5D2E32' }}>
+                            {getInitials(u.asc_name || "U")}
+                          </div>
+                          <span className="user-name-text">{u.asc_name}</span>
+                        </div>
+                      </td>
+                      <td><span className="user-phone-cell">{u.phone_no}</span></td>
+                      <td><span className="user-email-cell">{u.email}</span></td>
+                      <td>
+                        <span className={`role-badge ${getBadgeClass(u.role?.name || u.role)}`}>
+                          {u.role?.name || u.role}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-icons">
+                          <FiEdit className="action-icon" onClick={() => editUser(u)} title="Edit" />
+                          <FiTrash2 className="action-icon" onClick={() => openConfirmModal("delete", u)} title="Delete" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: "center", color: '#888' }}>
+                      No users found in directory
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {/* Pagination */}
+            {count > 5 && (
+              <div className="pagination-container">
+                <div className="pagination-info">
+                  Showing {(currentPage - 1) * 5 + 1}-{Math.min(currentPage * 5, count)} of {count} users
+                </div>
+                <div className="pagination-controls">
+                  <button disabled={!prevPage} onClick={() => fetchUsers(currentPage - 1)} className="page-nav-btn"><FiChevronLeft /></button>
+                  <span className={`page-num active`}>{currentPage}</span>
+                  {nextPage && <span className="page-num" onClick={() => fetchUsers(currentPage + 1)}>{currentPage + 1}</span>}
+                  <button disabled={!nextPage} onClick={() => fetchUsers(currentPage + 1)} className="page-nav-btn"><FiChevronRight /></button>
+                </div>
+              </div>
             )}
-          </tbody>
-        </table>
-        {/* Pagination */}
-        {count > 5 && <div className="pagination">
-          <button
-            disabled={!prevPage}
-            onClick={() => fetchUsers(currentPage - 1)}
-          >
-            ⬅ Previous
-          </button>
+          </section>
+        </div>
+      </main>
 
-          <span>Page {currentPage}</span>
-
-          <button
-            disabled={!nextPage}
-            onClick={() => fetchUsers(currentPage + 1)}
-          >
-            Next ➡
-          </button>
-        </div>}
-
-      </div>
+      {/* Modals */}
       {isConfirmOpen && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3>
-              {actionType === "edit" ? "Confirm Edit" : "Confirm Delete"}
-            </h3>
-
-            <p>
-              {actionType === "edit"
-                ? `Do you want to edit ${selectedUser?.asc_name}?`
-                : `Are you sure you want to delete ${selectedUser?.asc_name}? This action cannot be undone.`}
-            </p>
-
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete <strong>{selectedUser?.asc_name}</strong>? This action cannot be undone.</p>
             <div className="modal-actions">
-              <button onClick={closeConfirmModal}>Cancel</button>
-
-              <button
-                className={actionType === "delete" ? "danger" : "primary"}
-                onClick={handleConfirmAction}
-              >
-                {actionType === "edit" ? "Yes, Edit" : "Yes, Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* ------------ */}
-      {showSubmitConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h3>Confirm Update</h3>
-
-            <p>
-              Do you want to update this user?
-            </p>
-
-            <div className="modal-actions">
-              <button onClick={() => setShowSubmitConfirm(false)}>
-                Cancel
-              </button>
-
-              <button
-                className="primary"
-                onClick={() => {
-                  setShowSubmitConfirm(false);
-                  submitForm();
-                }}
-              >
-                Yes, Update
-              </button>
+              <button onClick={() => setIsConfirmOpen(false)}>Cancel</button>
+              <button className="danger" onClick={handleConfirmAction}>Yes, Delete</button>
             </div>
           </div>
         </div>

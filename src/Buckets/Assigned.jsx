@@ -721,7 +721,12 @@ export const Assigned = () => {
       {showFilter && (<>
         <div className="filter-overlay" onClick={() => setShowFilter(false)} />
         <div className="filter-panel">
-          <h3>Filter Leads</h3>
+          <div className="filter-header">
+            <h3>Filter Leads</h3>
+            <span className="close-btn" onClick={() => setShowFilter(false)}>
+              X
+            </span>
+          </div>
           {["name", "company", "designation"].map((key) => (
             <div className="filter-group" key={key}>
               <label>{key}</label>
