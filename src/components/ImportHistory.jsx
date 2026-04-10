@@ -46,13 +46,13 @@ const ImportHistory = () => {
 
                 <div className="dashboard-header-row" style={{ padding: '0 24px', alignItems: 'center' }}>
                     <div className="dashboard-title-group" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <button 
-                            onClick={() => navigate(-1)} 
-                            style={{ 
-                                background: '#f5f5f5', 
-                                border: 'none', 
-                                padding: '10px', 
-                                borderRadius: '8px', 
+                        <button
+                            onClick={() => navigate(-1)}
+                            style={{
+                                background: '#f5f5f5',
+                                border: 'none',
+                                padding: '10px',
+                                borderRadius: '8px',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',

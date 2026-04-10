@@ -359,3 +359,11 @@
     box-sizing: border-box;
   }
 }
+
+.logout {
+  margin: 0;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+}

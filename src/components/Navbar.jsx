@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { FiLogOut, FiMoon, FiSun, FiBell, FiHelpCircle } from "react-icons/fi";
+import { FiLogOut, FiMoon, FiSun, FiBell, FiHelpCircle, FiMenu, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../config.jsx";
 import "../styles/Navbar.css";
 
-export const Navbar = ({ pageTitle, subTitle }) => {
+export const Navbar = ({ pageTitle, subTitle, sidebarOpen, setSidebarOpen }) => {
     const navigate = useNavigate();
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
     const userName = localStorage.getItem("userName") || "User";
@@ -50,7 +50,15 @@ export const Navbar = ({ pageTitle, subTitle }) => {
     return (
         <nav className="top-navbar">
             <div className="navbar-left">
-                {/* Empty left side to push actions to the right or center as per image */}
+                {setSidebarOpen && (
+                    <button 
+                        className={`nav-action-btn menu-toggle-btn ${sidebarOpen ? 'sidebar-is-open' : ''}`}
+                        onClick={() => setSidebarOpen(!sidebarOpen)} 
+                        title="Toggle Sidebar"
+                    >
+                        {sidebarOpen ? <FiX /> : <FiMenu />}
+                    </button>
+                )}
             </div>
 
             <div className="navbar-right">

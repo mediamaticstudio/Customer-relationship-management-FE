@@ -21,14 +21,14 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
-// // <<<<<<< HEAD
 
+    const [allActiveServices, setAllActiveServices] = useState([]);
+    const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
+    const [existingResponseId, setExistingResponseId] = useState(null);
+    const [existingAnswers, setExistingAnswers] = useState([]);
+    const [viewMode, setViewMode] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     useEffect(() => {
-        if (serviceId) {
-            fetchServiceDetails();
-        }
-    }, [serviceId]);
-
         if (serviceId && leadId) {
             fetchInitialData();
         }
@@ -56,7 +56,9 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
                 axios.get(`${API_BASE_URL}/configurations/packages/`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
                 }),
-                axios.get(`${API_BASE_URL}/requirements/services/`)
+                axios.get(`${API_BASE_URL}/requirements/services/`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
+                })
             ]);
 
             // Handle potential variations in API response structure
@@ -112,29 +114,29 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
             setLoading(true);
 
             // 1. Fetch form structure
-            const serviceRes = await axios.get(`${API_BASE_URL}/requirements/services/${serviceId}/`);
+            const serviceRes = await axios.get(`${API_BASE_URL}/requirements/services/${serviceId}/`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
+            });
             if (serviceRes.data?.status === "success") {
                 const serviceData = serviceRes.data.data;
                 setService(serviceData);
 
                 // Initialize form data with defaults based on structure
-// >>>>>>> fix-ui-changes
                 const initialData = {};
                 serviceData.questions?.forEach(q => {
                     if (q.answer_type === 'checkbox') {
                         initialData[q.id] = [];
                     } else if (q.answer_type === 'file' || q.answer_type === 'image' || q.answer_type === 'video') {
-// <<<<<<< HEAD
                         initialData[q.id] = [null]; // start with one empty slot
-                        initialData[q.id] = [null];
-// >>>>>>> fix-ui-changes
                     } else {
                         initialData[q.id] = '';
                     }
                 });
 
                 // 2. Fetch existing response if any
-                const responseRes = await axios.get(`${API_BASE_URL}/requirements/responses/?lead=${leadId}&service=${serviceId}`);
+                const responseRes = await axios.get(`${API_BASE_URL}/requirements/responses/?lead=${leadId}&service=${serviceId}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
+                });
                 const responses = responseRes.data; // DRF returns list directly if using viewset list
 
                 if (Array.isArray(responses) && responses.length > 0) {
@@ -270,7 +272,9 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
                     service: parseInt(serviceId),
                     answers: answers_text_data
                 },
-                headers: hasFiles ? { 'Content-Type': 'multipart/form-data' } : {}
+                headers: hasFiles 
+                    ? { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${localStorage.getItem("access")}` } 
+                    : { 'Authorization': `Bearer ${localStorage.getItem("access")}` }
             });
 
             if (allActiveServices.length > 0 && currentServiceIndex < allActiveServices.length - 1) {
@@ -663,6 +667,8 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
                     <Navbar
                         pageTitle="Requirement Summary"
                         subTitle={`Viewing documentation for ${service.name}`}
+                        sidebarOpen={sidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
                     />
 
                     <div className="content" style={{ padding: '0 24px 24px' }}>
@@ -837,15 +843,29 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
                         <button className="btn-back-sleek" onClick={handleBack}>
                             <FiArrowLeft /> {currentStep > 0 ? 'Back to Previous Step' : (currentServiceIndex > 0 ? 'Previous Requirement' : 'Back to Lead')}
                         </button>
-                        {currentStep < totalSteps - 1 ? (
-                            <button className="btn-continue-sleek" onClick={handleNext}>
-                                Continue to Step {currentStep + 2} <FiArrowRight />
-                            </button>
-                        ) : (
-                            <button className="btn-continue-sleek" onClick={handleSubmit} disabled={submitting}>
-                                {submitting ? 'Submitting...' : (allActiveServices.length > 0 && currentServiceIndex < allActiveServices.length - 1 ? 'Proceed to Next Requirement' : 'Complete Form')} <FiSave />
-                            </button>
-                        )}
+                        
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            {currentStep < totalSteps - 1 ? (
+                                <>
+                                    {allActiveServices.length > 0 && currentServiceIndex < allActiveServices.length - 1 && (
+                                        <button 
+                                            className="btn-continue-sleek" 
+                                            style={{ background: '#f5f5f5', color: '#652b32', boxShadow: 'none' }}
+                                            onClick={() => navigate(`/requirements/${allActiveServices[currentServiceIndex + 1].id}/${leadId}`)}
+                                        >
+                                            View Next Requirement <FiArrowRight />
+                                        </button>
+                                    )}
+                                    <button className="btn-continue-sleek" onClick={handleNext}>
+                                        Continue to Step {currentStep + 2} <FiArrowRight />
+                                    </button>
+                                </>
+                            ) : (
+                                <button className="btn-continue-sleek" onClick={handleSubmit} disabled={submitting}>
+                                    {submitting ? 'Submitting...' : (allActiveServices.length > 0 && currentServiceIndex < allActiveServices.length - 1 ? 'Proceed to Next Requirement' : 'Complete Form')} <FiSave />
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -865,6 +885,8 @@ const DynamicRequirementForm = ({ serviceId: propServiceId, leadId: propLeadId, 
                 <Navbar
                     pageTitle="Requirement Gathering"
                     subTitle={`Completing details for ${service.name}`}
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
                 />
 
                 <div className="content" style={{ padding: '0 24px 24px' }}>

@@ -384,15 +384,15 @@ export const Assigned = () => {
         <div className="content">
           {user_role === "AGENT" && selectedStatus === "assigned" && (
             <div className="assigned-dashboard-center" style={{ padding: "0 32px" }}>
-              <UserDashBoard 
-                setToday={setToday} 
+              <UserDashBoard
+                setToday={setToday}
                 actionButtons={
                   <>
                     <select
                       value={selectedLanguage}
                       onChange={(e) => setSelectedLanguage(e.target.value)}
                       style={{
-                        background: "#fdf8f0", color: "#4A151E", border: "1.5px solid #4A151E", 
+                        background: "#fdf8f0", color: "#4A151E", border: "1.5px solid #4A151E",
                         borderRadius: "8px", padding: "0 14px", height: "42px", fontSize: "0.85rem", fontWeight: "600",
                         outline: "none", cursor: "pointer"
                       }}
@@ -412,7 +412,7 @@ export const Assigned = () => {
                       }}
                       disabled={loading}
                       style={{
-                        background: "#fdf8f0", color: "#4A151E", border: "1.5px solid #4A151E", 
+                        background: "#fdf8f0", color: "#4A151E", border: "1.5px solid #4A151E",
                         borderRadius: "8px", padding: "0 20px", height: "42px", display: "flex", alignItems: "center", gap: "8px",
                         fontWeight: "800", cursor: "pointer", fontSize: "0.85rem", transition: "all 0.2s"
                       }}
@@ -425,7 +425,7 @@ export const Assigned = () => {
                       className="back-btn" onClick={() => { navigate("/create") }}
                       disabled={loading}
                       style={{
-                        background: "#4A151E", color: "#fff", border: "none", 
+                        background: "#4A151E", color: "#fff", border: "none",
                         borderRadius: "8px", padding: "0 20px", height: "42px", display: "flex", alignItems: "center", gap: "8px",
                         fontWeight: "800", cursor: "pointer", fontSize: "0.85rem", transition: "all 0.2s",
                         boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
@@ -440,280 +440,280 @@ export const Assigned = () => {
               />
             </div>
           )}
-          
+
           <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid #efe8d8", margin: "0 32px 32px 32px", display: "flex", flexDirection: "column", minHeight: "50vh", boxShadow: "0 4px 12px rgba(0,0,0,0.02)", overflow: "hidden" }}>
-          {/* Header */}
-          {user_role !== "AGENT" ? (
-            <div className="table-header" style={{ padding: "32px 32px 12px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #f5f0e8" }}>
-              <div style={{
-                display: "flex", alignItems: "center",
-                background: "#fcfbfa", border: "1px solid #e8e3dc",
-                borderRadius: "8px", padding: "0 16px",
-                height: "44px", gap: "12px",
-                flex: "2",
-                transition: "border-color 0.2s"
-              }}>
-                <FiSearch size={16} color="#888" style={{ flexShrink: 0 }} />
-                <input
-                  type="text"
-                  placeholder="Search by name, company or designation..."
-                  value={search}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setSearch(val);
-                    setPage(1);
-                    if (val) setIsGlobal(true);
-                  }}
-                  style={{
-                    border: "none", outline: "none", background: "transparent",
-                    fontSize: "0.85rem", color: "#333", width: "100%", fontWeight: "500"
-                  }}
-                />
-                {search && (
-                  <button
-                    onClick={() => { setSearch(""); setIsGlobal(false); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#bbb", flexShrink: 0 }}
-                  >
-                    <FiX size={14} />
-                  </button>
-                )}
-              </div>
-              <div style={{ display: "flex", gap: "12px", height: "44px" }}>
-                <button 
-                  onClick={() => setShowFilter(true)} 
-                  style={{ 
-                    background: "#4A151E", color: "#fff", border: "none", 
-                    borderRadius: "8px", padding: "0 24px", fontSize: "0.85rem", fontWeight: "700",
-                    cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#651d28"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#4A151E"; }}
-                >
-                  Filter
-                </button>
-                <button 
-                  onClick={handleReset} 
-                  style={{ 
-                    background: "#fcfbfa", color: "#4A151E", border: "1px solid #e8e3dc", 
-                    borderRadius: "8px", padding: "0 14px", display: "flex", alignItems: "center", 
-                    cursor: "pointer", transition: "all 0.2s" 
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#f4f0e8"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#fcfbfa"; }}
-                >
-                  <FiRotateCcw size={18} />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="agent-status-filter" style={{ padding: "32px 32px 12px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #f5f0e8" }}>
-              <div style={{
-                display: "flex", alignItems: "center",
-                background: "#fcfbfa", border: "1px solid #e8e3dc",
-                borderRadius: "8px", padding: "0 16px",
-                height: "44px", gap: "12px",
-                flex: "2",
-                transition: "border-color 0.2s"
-              }}>
-                <FiSearch size={16} color="#888" style={{ flexShrink: 0 }} />
-                <input
-                  type="text"
-                  placeholder="Search by name, company or designation..."
-                  value={search}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setSearch(val);
-                    setPage(1);
-                    if (val) setIsGlobal(true);
-                  }}
-                  style={{
-                    border: "none", outline: "none", background: "transparent",
-                    fontSize: "0.85rem", color: "#333", width: "100%", fontWeight: "500"
-                  }}
-                />
-                {search && (
-                  <button
-                    onClick={() => { setSearch(""); setIsGlobal(false); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#bbb", flexShrink: 0 }}
-                  >
-                    <FiX size={14} />
-                  </button>
-                )}
-              </div>
-
-              <select
-                value={filters.phone_status}
-                onChange={(e) => { setFilters({ ...filters, phone_status: e.target.value }); setPage(1); }}
-                style={{
-                  padding: "0 16px",
-                  borderRadius: "8px",
-                  border: "1px solid #e8e3dc",
-                  background: "#fcfbfa",
-                  color: "#555",
-                  fontSize: "0.85rem",
-                  fontWeight: "600",
-                  outline: "none",
-                  cursor: "pointer",
-                  height: "44px",
-                  flex: "1",
-                  appearance: "none",
-                  backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 16px center",
-                  backgroundSize: "16px",
+            {/* Header */}
+            {user_role !== "AGENT" ? (
+              <div className="table-header" style={{ padding: "32px 32px 12px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #f5f0e8" }}>
+                <div style={{
+                  display: "flex", alignItems: "center",
+                  background: "#fcfbfa", border: "1px solid #e8e3dc",
+                  borderRadius: "8px", padding: "0 16px",
+                  height: "44px", gap: "12px",
+                  flex: "2",
                   transition: "border-color 0.2s"
-                }}
-              >
-                <option value="">Filter by Phone Status</option>
-                {(() => {
-                  const bucketMap = {
-                    "assigned": ["callback", "interested", "followup", "direct-voicemail", "general-voicemail", "email-request", "language-barrier"],
-                    "second-attempt": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
-                    "third-attempt": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
-                    "followup": ["followup", "callback", "interested", "Callback-Voicemail", "email-request", "language-barrier"],
-                    "prospect": ["interested"],
-                    "completed": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
-                    "re-research": ["wrong-number", "not-in-service", "disconnected", "fax-tone", "invalid"],
-                    "deal-won": ["converted"],
-                    "sale-lost": ["not-interested"],
-                    "invalid": ["invalid", "duplicate", "fax-tone"],
-                    "dnd": ["dnd"]
-                  };
-                  const allowed = bucketMap[selectedStatus] || [];
-                  const filtered = allowed.length > 0
-                    ? STATUS_OPTIONS.filter(opt => allowed.includes(opt.value))
-                    : STATUS_OPTIONS;
-
-                  return filtered.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ));
-                })()}
-                <option value="other">Other Statuses...</option>
-              </select>
-              {filters.phone_status && (
-                <button
-                  onClick={() => { setFilters({ ...filters, phone_status: "" }); setPage(1); }}
-                  style={{ background: "#eee", border: "none", padding: "8px 12px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Table */}
-          <div style={{ flex: 1, overflowX: "auto" }}>
-            <table className="leads" style={{ margin: 0, width: "100%" }}>
-              <thead>
-              <tr>
-                {selectedStatus == "unassigned" && <th>
+                }}>
+                  <FiSearch size={16} color="#888" style={{ flexShrink: 0 }} />
                   <input
-                    className="select-all"
-                    type="checkbox"
-                    checked={
-                      leads.length > 0 &&
-                      selectedLeads.length === leads.length
-                    }
-                    onChange={toggleAll}
+                    type="text"
+                    placeholder="Search by name, company or designation..."
+                    value={search}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSearch(val);
+                      setPage(1);
+                      if (val) setIsGlobal(true);
+                    }}
+                    style={{
+                      border: "none", outline: "none", background: "transparent",
+                      fontSize: "0.85rem", color: "#333", width: "100%", fontWeight: "500"
+                    }}
                   />
-                </th>}
-                <th>Name</th>
-                <th>Company</th>
-                <th>Designation</th>
-                {/* <th>Bucket</th> */}
-                <th>Last Updated</th>
-              </tr>
-            </thead>
+                  {search && (
+                    <button
+                      onClick={() => { setSearch(""); setIsGlobal(false); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#bbb", flexShrink: 0 }}
+                    >
+                      <FiX size={14} />
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: "12px", height: "44px" }}>
+                  <button
+                    onClick={() => setShowFilter(true)}
+                    style={{
+                      background: "#4A151E", color: "#fff", border: "none",
+                      borderRadius: "8px", padding: "0 24px", fontSize: "0.85rem", fontWeight: "700",
+                      cursor: "pointer", transition: "all 0.2s", boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#651d28"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#4A151E"; }}
+                  >
+                    Filter
+                  </button>
+                  <button
+                    onClick={handleReset}
+                    style={{
+                      background: "#fcfbfa", color: "#4A151E", border: "1px solid #e8e3dc",
+                      borderRadius: "8px", padding: "0 14px", display: "flex", alignItems: "center",
+                      cursor: "pointer", transition: "all 0.2s"
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#f4f0e8"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#fcfbfa"; }}
+                  >
+                    <FiRotateCcw size={18} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="agent-status-filter" style={{ padding: "32px 32px 12px", display: "flex", alignItems: "center", gap: "16px", borderBottom: "1px solid #f5f0e8" }}>
+                <div style={{
+                  display: "flex", alignItems: "center",
+                  background: "#fcfbfa", border: "1px solid #e8e3dc",
+                  borderRadius: "8px", padding: "0 16px",
+                  height: "44px", gap: "12px",
+                  flex: "2",
+                  transition: "border-color 0.2s"
+                }}>
+                  <FiSearch size={16} color="#888" style={{ flexShrink: 0 }} />
+                  <input
+                    type="text"
+                    placeholder="Search by name, company or designation..."
+                    value={search}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSearch(val);
+                      setPage(1);
+                      if (val) setIsGlobal(true);
+                    }}
+                    style={{
+                      border: "none", outline: "none", background: "transparent",
+                      fontSize: "0.85rem", color: "#333", width: "100%", fontWeight: "500"
+                    }}
+                  />
+                  {search && (
+                    <button
+                      onClick={() => { setSearch(""); setIsGlobal(false); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#bbb", flexShrink: 0 }}
+                    >
+                      <FiX size={14} />
+                    </button>
+                  )}
+                </div>
 
-            <tbody>
-              {loading ? (
-                <tr><td colSpan="4">Loading...</td></tr>
-              ) : leads.length === 0 ? (
-                <tr><td colSpan="4">No data found</td></tr>
-              ) : (
-                leads.map((lead) => (
-                  <tr key={lead.id}>
-                    {selectedStatus == "unassigned" && <td>
+                <select
+                  value={filters.phone_status}
+                  onChange={(e) => { setFilters({ ...filters, phone_status: e.target.value }); setPage(1); }}
+                  style={{
+                    padding: "0 16px",
+                    borderRadius: "8px",
+                    border: "1px solid #e8e3dc",
+                    background: "#fcfbfa",
+                    color: "#555",
+                    fontSize: "0.85rem",
+                    fontWeight: "600",
+                    outline: "none",
+                    cursor: "pointer",
+                    height: "44px",
+                    flex: "1",
+                    appearance: "none",
+                    backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 16px center",
+                    backgroundSize: "16px",
+                    transition: "border-color 0.2s"
+                  }}
+                >
+                  <option value="">Filter by Phone Status</option>
+                  {(() => {
+                    const bucketMap = {
+                      "assigned": ["callback", "interested", "followup", "direct-voicemail", "general-voicemail", "email-request", "language-barrier"],
+                      "second-attempt": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
+                      "third-attempt": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
+                      "followup": ["followup", "callback", "interested", "Callback-Voicemail", "email-request", "language-barrier"],
+                      "prospect": ["interested"],
+                      "completed": ["unanswered", "receptionist", "hung-up", "call-failed", "spam-blocked", "not-accepting", "direct-voicemail", "general-voicemail"],
+                      "re-research": ["wrong-number", "not-in-service", "disconnected", "fax-tone", "invalid"],
+                      "deal-won": ["converted"],
+                      "sale-lost": ["not-interested"],
+                      "invalid": ["invalid", "duplicate", "fax-tone"],
+                      "dnd": ["dnd"]
+                    };
+                    const allowed = bucketMap[selectedStatus] || [];
+                    const filtered = allowed.length > 0
+                      ? STATUS_OPTIONS.filter(opt => allowed.includes(opt.value))
+                      : STATUS_OPTIONS;
+
+                    return filtered.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ));
+                  })()}
+                  <option value="other">Other Statuses...</option>
+                </select>
+                {filters.phone_status && (
+                  <button
+                    onClick={() => { setFilters({ ...filters, phone_status: "" }); setPage(1); }}
+                    style={{ background: "#eee", border: "none", padding: "8px 12px", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Table */}
+            <div style={{ flex: 1, overflowX: "auto" }}>
+              <table className="leads" style={{ margin: 0, width: "100%" }}>
+                <thead>
+                  <tr>
+                    {selectedStatus == "unassigned" && <th>
                       <input
+                        className="select-all"
                         type="checkbox"
-                        checked={selectedLeads.includes(lead.id)}
-                        onChange={() => toggleLead(lead.id)}
+                        checked={
+                          leads.length > 0 &&
+                          selectedLeads.length === leads.length
+                        }
+                        onChange={toggleAll}
                       />
-                    </td>}
-                    <td onClick={() => navigate(`/leads/${lead.id}?${searchParams.toString()}`)} data-label="Name" style={{ cursor: "pointer" }}>
-                      {lead.lead_name}
-                      {lead.lead_phones && lead.lead_phones.some(p => p.status === "converted") && (
-                        <span style={{
-                          backgroundColor: "#f59e0b",
-                          color: "white",
-                          padding: "2px 6px",
-                          borderRadius: "4px",
-                          fontSize: "0.75rem",
-                          marginLeft: "8px",
-                          fontWeight: "bold"
-                        }}>Waiting</span>
-                      )}
-                    </td>
-                    <td data-label="Company">{lead.lead_company || "-"}</td>
-                    <td data-label="Designation">{lead.lead_designation || "-"}</td>
-                    {/* <td data-label="Bucket">
+                    </th>}
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Designation</th>
+                    {/* <th>Bucket</th> */}
+                    <th>Last Updated</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {loading ? (
+                    <tr><td colSpan="4">Loading...</td></tr>
+                  ) : leads.length === 0 ? (
+                    <tr><td colSpan="4">No data found</td></tr>
+                  ) : (
+                    leads.map((lead) => (
+                      <tr key={lead.id}>
+                        {selectedStatus == "unassigned" && <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedLeads.includes(lead.id)}
+                            onChange={() => toggleLead(lead.id)}
+                          />
+                        </td>}
+                        <td onClick={() => navigate(`/leads/${lead.id}?${searchParams.toString()}`)} data-label="Name" style={{ cursor: "pointer" }}>
+                          {lead.lead_name}
+                          {lead.lead_phones && lead.lead_phones.some(p => p.status === "converted") && (
+                            <span style={{
+                              backgroundColor: "#f59e0b",
+                              color: "white",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              fontSize: "0.75rem",
+                              marginLeft: "8px",
+                              fontWeight: "bold"
+                            }}>Waiting</span>
+                          )}
+                        </td>
+                        <td data-label="Company">{lead.lead_company || "-"}</td>
+                        <td data-label="Designation">{lead.lead_designation || "-"}</td>
+                        {/* <td data-label="Bucket">
                       <span className={`status-badge ${lead.status}`}>
                         {BUCKET_NAMES[lead.status] || lead.status}
                       </span>
                     </td> */}
-                    <td data-label="Updated">{formatDate(lead.status_updated_at)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-          </div>
-
-          {/* BULK CONTROLS BELOW TABLE */}
-          <div className="bulk-controls">
-            <div className="bulk-left">
-              {selectedStatus === "unassigned" && (user_role === "ADMIN" || user_role === "SUPERADMIN") && (
-                <AgentList
-                  handleBulkAssign={handleBulkAssign}
-                  assigning={assigning}
-                  agents={agents}
-                  selectedLeads={selectedLeads}
-                />
-              )}
+                        <td data-label="Updated">{formatDate(lead.status_updated_at)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
 
-            <div className="bulk-center">
-              {!loading && totalPages > 1 && (
-                <div className="pagination">
-                  <button disabled={page === 1} onClick={() => setPage(1)}>First</button>
-                  <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>⬅ Prev</button>
-                  <span>Page {page} of {totalPages}</span>
-                  <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next ➡</button>
-                  <button disabled={page === totalPages} onClick={() => setPage(totalPages)}>Last</button>
-                </div>
-              )}
-            </div>
+            {/* BULK CONTROLS BELOW TABLE */}
+            <div className="bulk-controls">
+              <div className="bulk-left">
+                {selectedStatus === "unassigned" && (user_role === "ADMIN" || user_role === "SUPERADMIN") && (
+                  <AgentList
+                    handleBulkAssign={handleBulkAssign}
+                    assigning={assigning}
+                    agents={agents}
+                    selectedLeads={selectedLeads}
+                  />
+                )}
+              </div>
 
-            <div className="bulk-right">
-              {totalCount > 10 && (
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setPage(1);
-                  }}
-                >
-                  {[10, 25, 50].map((n) => (
-                    <option key={n} value={n}>
-                      {n} / page
-                    </option>
-                  ))}
-                </select>
-              )}
+              <div className="bulk-center">
+                {!loading && totalPages > 1 && (
+                  <div className="pagination">
+                    <button disabled={page === 1} onClick={() => setPage(1)}>First</button>
+                    <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>⬅ Prev</button>
+                    <span>Page {page} of {totalPages}</span>
+                    <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next ➡</button>
+                    <button disabled={page === totalPages} onClick={() => setPage(totalPages)}>Last</button>
+                  </div>
+                )}
+              </div>
+
+              <div className="bulk-right">
+                {totalCount > 10 && (
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setPage(1);
+                    }}
+                  >
+                    {[10, 25, 50].map((n) => (
+                      <option key={n} value={n}>
+                        {n} / page
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
-          </div>
           </div>{/* END WHITE CARD */}
         </div>
       </main>

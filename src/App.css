@@ -102,8 +102,10 @@ html {
 
 /* MODERN ALTERNATIVE: Seamless Hidden Scrolling (Premium SaaS Feel) */
 * {
-  -ms-overflow-style: none !important; /* IE and Edge */
-  scrollbar-width: none !important;    /* Firefox */
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+  /* Firefox */
 }
 
 /* Removed aggressive scrollbar hiding to prevent user confusion on scrolling content */
