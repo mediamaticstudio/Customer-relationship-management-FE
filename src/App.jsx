@@ -26,6 +26,7 @@ import { ASCLogin } from "./components/ASCLogin";
 import ASCCredentialsManager from "./components/ASCCredentialsManager";
 import NotFound from "./components/NotFound";
 import DynamicRequirementForm from "./components/DynamicRequirementForm";
+import ImportHistory from "./components/ImportHistory";
 
 
 import { useEffect } from "react";
@@ -52,6 +53,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/asc-login" element={<ASCLogin />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/import-history" element={<ImportHistory />} />
         <Route path="/user" element={<UserManagement />} />
         <Route path="/assigned" element={<Assigned />} />
         <Route path="/reports" element={<Reports />} />

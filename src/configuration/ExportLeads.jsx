@@ -5,10 +5,15 @@ import { FiDownload, FiRefreshCcw } from "react-icons/fi";
 
 const ExportLeads = () => {
   const [loading, setLoading] = useState(false);
+  const [fileNameInput, setFileNameInput] = useState("");
 
   const handleExport = async () => {
-    const fileName = prompt("Enter file name", "leads");
-    if (!fileName) return;
+    const fileName = fileNameInput.trim();
+    
+    if (!fileName) {
+      toast.error("Please enter a file name");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -36,23 +41,26 @@ const ExportLeads = () => {
   };
 
   return (
-    <>
-      <div className="location-selector">
-        <label className="field-label">FILE NAME</label>
+    <div className="import-box" style={{ height: '100%', justifyContent: 'space-between' }}>
+      <div className="location-selector" style={{ marginBottom: '20px' }}>
+        <label className="premium-label">FILE NAME</label>
         <input
           type="text"
           placeholder="Enter file name"
-          className="input"
+          className="premium-input"
+          value={fileNameInput}
+          onChange={(e) => setFileNameInput(e.target.value)}
         />
-      </ div>
+      </div>
       <button
         onClick={handleExport}
-        disabled={loading}
+        disabled={loading || !fileNameInput.trim()}
         className="settings-btn" id="export-btn"
       >
         {loading ? <FiRefreshCcw className="spinning" /> : <FiDownload />}
         {loading ? "Preparing..." : "Export Lead Data"}
-      </button></>
+      </button>
+    </div>
   );
 };
 

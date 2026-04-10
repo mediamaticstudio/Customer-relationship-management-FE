@@ -140,7 +140,25 @@
 
 .refresh-icon-btn:hover {
     background: #6b1f2b;
-    transform: rotate(45deg);
+    transform: scale(1.05);
+}
+
+.refresh-icon-btn:active {
+    transform: scale(0.95);
+}
+
+.refresh-icon-btn.spinning svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ================================
@@ -369,4 +387,217 @@
     background: #6b1f2b;
     border-radius: 4px;
     transition: width 0.3s ease;
+}
+
+/* ================================
+   MODAL & DRILL-DOWN TABLE
+================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.lead-import-modal {
+    background: #ffffff;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+    border: 1px solid #e8e0cc;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 24px 28px;
+    background: #fffcf5;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #3e1018;
+    font-weight: 800;
+}
+
+.modal-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: #a3937b;
+    font-weight: 600;
+}
+
+.close-modal-btn {
+    background: #f5f5f5;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.close-modal-btn:hover {
+    background: #3e1018;
+    color: white;
+}
+
+.modal-body {
+    padding: 0;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.import-details-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.import-details-table th {
+    background: #f9f9f9;
+    color: #8c7e6a;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    padding: 12px 28px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+}
+
+.import-details-table td {
+    padding: 16px 28px;
+    border-bottom: 1px solid #f9f9f9;
+    font-size: 0.95rem;
+}
+
+.bold-cell {
+    font-weight: 700;
+    color: #111;
+}
+
+.italic-cell {
+    font-style: italic;
+    color: #666;
+    font-size: 0.88rem;
+}
+
+.count-cell {
+    font-weight: 800;
+    color: #3e1018;
+}
+
+.status-cell {
+    text-align: center;
+}
+
+.status-icon {
+    font-size: 1.25rem;
+}
+
+.status-icon.success {
+    color: #27ae60;
+}
+
+.status-icon.danger {
+    color: #e74c3c;
+}
+
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.warning {
+    background: #f39c12;
+}
+
+.lang-pill {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lang-english {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.lang-hindi {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.lang-tamil {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.lang-telugu {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.lang-general {
+    background: #f5f5f5;
+    color: #616161;
+}
+
+.modal-footer {
+    padding: 16px 28px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.empty-table {
+    text-align: center;
+    padding: 40px !important;
+    color: #999;
+    font-style: italic;
 }

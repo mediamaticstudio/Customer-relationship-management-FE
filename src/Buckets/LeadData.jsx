@@ -569,137 +569,137 @@ export const LeadData = () => {
               {/* CONVERTED SECTION (Moved into Left Column as requested) */}
               {/* SERVICE TYPE CARD - Always visible */}
               {phones.some(p => p.status === "converted") && (
-                  <div className="ui-card" style={{ padding: "16px" }}>
-                    <div style={{ marginBottom: "16px" }}>
-                      <h3 style={{ fontSize: "0.95rem", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><FiPackage /> Service Type</h3>
-                    </div>
-                    
-                    <div style={{ display: "flex", gap: "24px" }}>
-                      {/* Left Side: Checkboxes */}
-                      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {filteredPackages.length > 0 ? (
-                          filteredPackages.map((pkg) => (
-                            <div key={pkg.id}>
-                              <div className="package-item" style={{ marginBottom: "2px", padding: "4px 8px" }} onClick={() => {
-                                const isChecked = selectedPackages.includes(`pkg_${pkg.id}`);
-                                if (!isChecked) {
-                                  if (pkg.package_name.toLowerCase().includes("brand management")) {
-                                    setSelectedPackages([`pkg_${pkg.id}`]);
-                                  } else {
-                                    setSelectedPackages([...selectedPackages, `pkg_${pkg.id}`]);
-                                  }
+                <div className="ui-card" style={{ padding: "16px" }}>
+                  <div style={{ marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "0.95rem", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><FiPackage /> Service Type</h3>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "24px" }}>
+                    {/* Left Side: Checkboxes */}
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                      {filteredPackages.length > 0 ? (
+                        filteredPackages.map((pkg) => (
+                          <div key={pkg.id}>
+                            <div className="package-item" style={{ marginBottom: "2px", padding: "4px 8px" }} onClick={() => {
+                              const isChecked = selectedPackages.includes(`pkg_${pkg.id}`);
+                              if (!isChecked) {
+                                if (pkg.package_name.toLowerCase().includes("brand management")) {
+                                  setSelectedPackages([`pkg_${pkg.id}`]);
                                 } else {
-                                  const subIds = pkg.sub_packages ? pkg.sub_packages.map(s => `sub_${s.id}`) : [];
-                                  setSelectedPackages(selectedPackages.filter(id => id !== `pkg_${pkg.id}` && !subIds.includes(id)));
+                                  setSelectedPackages([...selectedPackages, `pkg_${pkg.id}`]);
                                 }
-                              }}>
-                                <input type="checkbox" className="ui-custom-checkbox" checked={selectedPackages.includes(`pkg_${pkg.id}`)} readOnly />
-                                <span className="package-name" style={{ fontSize: "0.85rem", color: selectedPackages.includes(`pkg_${pkg.id}`) ? "#800000" : "#333", fontWeight: selectedPackages.includes(`pkg_${pkg.id}`) ? "700" : "500" }}>{pkg.package_name}</span>
-                              </div>
-                              {pkg.sub_packages && pkg.sub_packages.length > 0 && selectedPackages.includes(`pkg_${pkg.id}`) && (
-                                <div style={{ marginLeft: "28px", borderLeft: "2px solid #f5f0e8", paddingLeft: "12px", marginTop: "4px", marginBottom: "8px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                                  {pkg.sub_packages.map(sub => (
-                                    <div key={sub.id} className="package-item" style={{ marginBottom: 0, padding: "3px 8px", borderRadius: "6px" }} onClick={(e) => {
-                                      e.stopPropagation();
-                                      const isChecked = selectedPackages.includes(`sub_${sub.id}`);
-                                      if (!isChecked) {
-                                        setSelectedPackages([...selectedPackages, `sub_${sub.id}`]);
-                                      } else {
-                                        setSelectedPackages(selectedPackages.filter(id => id !== `sub_${sub.id}`));
-                                      }
-                                    }}>
-                                      <input type="checkbox" className="ui-custom-checkbox mini" checked={selectedPackages.includes(`sub_${sub.id}`)} readOnly />
-                                      <span className="package-name" style={{ fontSize: "0.8rem", color: selectedPackages.includes(`sub_${sub.id}`) ? "#800000" : "#666" }}>{sub.sub_package_name}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
+                              } else {
+                                const subIds = pkg.sub_packages ? pkg.sub_packages.map(s => `sub_${s.id}`) : [];
+                                setSelectedPackages(selectedPackages.filter(id => id !== `pkg_${pkg.id}` && !subIds.includes(id)));
+                              }
+                            }}>
+                              <input type="checkbox" className="ui-custom-checkbox" checked={selectedPackages.includes(`pkg_${pkg.id}`)} readOnly />
+                              <span className="package-name" style={{ fontSize: "0.85rem", color: selectedPackages.includes(`pkg_${pkg.id}`) ? "#800000" : "#333", fontWeight: selectedPackages.includes(`pkg_${pkg.id}`) ? "700" : "500" }}>{pkg.package_name}</span>
                             </div>
-                          ))
-                        ) : (
-                          <p style={{ fontSize: "0.8rem" }}>No packages found.</p>
-                        )}
-                      </div>
-
-                      {/* Right Side: Active Requirements Buttons */}
-                      <div style={{ flex: 1, borderLeft: "1px solid #f5eee0", paddingLeft: "24px" }}>
-                        <span className="field-label" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", display: "block", color: "#888" }}>Required Documentation</span>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                          {(() => {
-                            const activeRequirementForms = [];
-                              selectedPackages.forEach(id => {
-                                if (id.startsWith("pkg_")) {
-                                  const pkg = packages.find(p => p.id === parseInt(id.replace("pkg_", "")));
-                                  if (pkg) {
-                                    let searchNames = [pkg.package_name.toLowerCase()];
-                                    
-                                    // Map Digital Marketing to both SEO and SMO
-                                    if (searchNames[0].includes("digital marketing")) {
-                                      searchNames = ["seo", "smo"];
-                                    } else if (searchNames[0].includes("seo")) {
-                                      searchNames = ["seo"];
-                                    } else if (searchNames[0].includes("smo")) {
-                                      searchNames = ["smo"];
-                                    } else if (searchNames[0].includes("content management")) {
-                                      searchNames = ["content management"];
-                                    } else if (searchNames[0].includes("website development")) {
-                                      searchNames = ["website development"];
-                                    } else if (searchNames[0].includes("brand management")) {
-                                      searchNames = ["brand management"];
+                            {pkg.sub_packages && pkg.sub_packages.length > 0 && selectedPackages.includes(`pkg_${pkg.id}`) && (
+                              <div style={{ marginLeft: "28px", borderLeft: "2px solid #f5f0e8", paddingLeft: "12px", marginTop: "4px", marginBottom: "8px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                                {pkg.sub_packages.map(sub => (
+                                  <div key={sub.id} className="package-item" style={{ marginBottom: 0, padding: "3px 8px", borderRadius: "6px" }} onClick={(e) => {
+                                    e.stopPropagation();
+                                    const isChecked = selectedPackages.includes(`sub_${sub.id}`);
+                                    if (!isChecked) {
+                                      setSelectedPackages([...selectedPackages, `sub_${sub.id}`]);
+                                    } else {
+                                      setSelectedPackages(selectedPackages.filter(id => id !== `sub_${sub.id}`));
                                     }
+                                  }}>
+                                    <input type="checkbox" className="ui-custom-checkbox mini" checked={selectedPackages.includes(`sub_${sub.id}`)} readOnly />
+                                    <span className="package-name" style={{ fontSize: "0.8rem", color: selectedPackages.includes(`sub_${sub.id}`) ? "#800000" : "#666" }}>{sub.sub_package_name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p style={{ fontSize: "0.8rem" }}>No packages found.</p>
+                      )}
+                    </div>
 
-                                    searchNames.forEach(sName => {
-                                      const match = (serviceAreas || []).find(s => 
-                                        s.name.toLowerCase() === sName || 
-                                        s.name.toLowerCase().includes(sName)
-                                      );
-                                      
-                                      if (match && !activeRequirementForms.find(f => f.id === match.id)) {
-                                        activeRequirementForms.push(match);
-                                      }
-                                    });
-                                  }
+                    {/* Right Side: Active Requirements Buttons */}
+                    <div style={{ flex: 1, borderLeft: "1px solid #f5eee0", paddingLeft: "24px" }}>
+                      <span className="field-label" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", display: "block", color: "#888" }}>Required Documentation</span>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        {(() => {
+                          const activeRequirementForms = [];
+                          selectedPackages.forEach(id => {
+                            if (id.startsWith("pkg_")) {
+                              const pkg = packages.find(p => p.id === parseInt(id.replace("pkg_", "")));
+                              if (pkg) {
+                                let searchNames = [pkg.package_name.toLowerCase()];
+
+                                // Map Digital Marketing to both SEO and SMO
+                                if (searchNames[0].includes("digital marketing")) {
+                                  searchNames = ["seo", "smo"];
+                                } else if (searchNames[0].includes("seo")) {
+                                  searchNames = ["seo"];
+                                } else if (searchNames[0].includes("smo")) {
+                                  searchNames = ["smo"];
+                                } else if (searchNames[0].includes("content management")) {
+                                  searchNames = ["content management"];
+                                } else if (searchNames[0].includes("website development")) {
+                                  searchNames = ["website development"];
+                                } else if (searchNames[0].includes("brand management")) {
+                                  searchNames = ["brand management"];
                                 }
-                              });
 
-                            // Fetch global Business Requirements form
-                            const businessReqForm = (serviceAreas || []).find(s => s.name.toLowerCase() === "business requirements");
+                                searchNames.forEach(sName => {
+                                  const match = (serviceAreas || []).find(s =>
+                                    s.name.toLowerCase() === sName ||
+                                    s.name.toLowerCase().includes(sName)
+                                  );
 
-                            // Filter: If Brand Management is present, show ONLY Brand Management
-                            const brandManagement = activeRequirementForms.find(f => 
-                              f.name.toLowerCase().includes("brand management")
-                            );
-
-                            let finalForms = brandManagement ? [brandManagement] : activeRequirementForms;
-
-                            if (finalForms.length === 0) {
-                              return <p style={{ fontSize: "0.8rem", color: "#999", fontStyle: "italic" }}>Select a service type to see requirements.</p>;
+                                  if (match && !activeRequirementForms.find(f => f.id === match.id)) {
+                                    activeRequirementForms.push(match);
+                                  }
+                                });
+                              }
                             }
+                          });
 
-                            // Always include Business Requirements first
-                            if (businessReqForm && !finalForms.find(f => f.id === businessReqForm.id)) {
-                              finalForms = [businessReqForm, ...finalForms];
-                            }
+                          // Fetch global Business Requirements form
+                          const businessReqForm = (serviceAreas || []).find(s => s.name.toLowerCase() === "business requirements");
 
-                            return finalForms.map(service => (
-                              <button 
-                                key={service.id} 
-                                className="btn-requirement-sleek" 
-                                style={{ width: "100%", justifyContent: "space-between" }}
-                                onClick={() => {
-                                  window.open(`/requirements/${service.id}/${id}`, '_blank');
-                                }}
-                              >
-                                <span>Fill {service.name} Details</span>
-                                <FiArrowRight />
-                              </button>
-                            ));
-                          })()}
-                        </div>
+                          // Filter: If Brand Management is present, show ONLY Brand Management
+                          const brandManagement = activeRequirementForms.find(f =>
+                            f.name.toLowerCase().includes("brand management")
+                          );
+
+                          let finalForms = brandManagement ? [brandManagement] : activeRequirementForms;
+
+                          if (finalForms.length === 0) {
+                            return <p style={{ fontSize: "0.8rem", color: "#999", fontStyle: "italic" }}>Select a service type to see requirements.</p>;
+                          }
+
+                          // Always include Business Requirements first
+                          if (businessReqForm && !finalForms.find(f => f.id === businessReqForm.id)) {
+                            finalForms = [businessReqForm, ...finalForms];
+                          }
+
+                          return finalForms.map(service => (
+                            <button
+                              key={service.id}
+                              className="btn-requirement-sleek"
+                              style={{ width: "100%", justifyContent: "space-between" }}
+                              onClick={() => {
+                                navigate(`/requirements/${service.id}/${id}`);
+                              }}
+                            >
+                              <span>Fill {service.name} Details</span>
+                              <FiArrowRight />
+                            </button>
+                          ));
+                        })()}
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
             </div>
             <div className="col-right">
               {/* COMMUNICATION CARD (Switched position for balance) */}

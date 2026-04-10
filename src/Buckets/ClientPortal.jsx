@@ -42,8 +42,9 @@ export const ClientPortal = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [leads, setLeads] = useState([]);
-  const [packages, setPackages] = useState([]);
-  const [loading, setLoading] = useState(false);
+   const [packages, setPackages] = useState([]);
+   const [serviceAreas, setServiceAreas] = useState([]);
+   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   const [page, setPage] = useState(1);
@@ -61,7 +62,19 @@ export const ClientPortal = () => {
     }
   };
 
-  useEffect(() => { fetchPackages(); }, []);
+  const fetchServiceAreas = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/requirements/services/`);
+      if (res.data?.status === "success") setServiceAreas(res.data.data || []);
+    } catch (e) {
+      console.error("Failed to load service areas", e);
+    }
+  };
+
+  useEffect(() => { 
+    fetchPackages(); 
+    fetchServiceAreas();
+  }, []);
 
   const fetchLeads = useCallback(async () => {
     setLoading(true);
@@ -290,29 +303,90 @@ export const ClientPortal = () => {
                           </span>
                         </td>
 
-                        {/* Requirement Form */}
+                        {/* Requirement Form column */}
                         <td style={{ padding: "18px 16px" }}>
-                          <button
-                            onClick={() => toast.info(`Requirement form for ${lead.lead_name}`)}
-                            style={{
-                              background: "transparent",
-                              border: "1.5px solid #6C3A39",
-                              color: "#6C3A39",
-                              padding: "6px 16px",
-                              borderRadius: "8px",
-                              fontSize: "0.82rem",
-                              fontWeight: "600",
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              transition: "all 0.15s"
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "#6C3A39"; e.currentTarget.style.color = "#fff"; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#6C3A39"; }}
-                          >
-                            Requirements <FiArrow size={13} />
-                          </button>
+                          {(() => {
+                            const selected = lead.other_lead_info?.selected_packages || [];
+                            const activeForms = [];
+
+                            // 1. Always include Business Requirements
+                            const businessReq = serviceAreas.find(s => s.name.toLowerCase().includes("business requirement"));
+                            if (businessReq) activeForms.push(businessReq);
+
+                            // 2. Map selected packages to other forms
+                            selected.forEach(pkgId => {
+                              let targetId = pkgId;
+                              if (typeof pkgId === "string") {
+                                targetId = parseInt(pkgId.replace("pkg_", "").replace("sub_", ""), 10);
+                              }
+
+                              const pkg = packages.find(p => p.id === targetId) ||
+                                packages.flatMap(p => p.sub_packages || []).find(sub => sub.id === targetId);
+
+                              if (pkg) {
+                                const pkgName = (pkg.package_name || pkg.sub_package_name || "").toLowerCase();
+                                let searchNames = [pkgName];
+
+                                if (pkgName.includes("digital marketing")) searchNames = ["seo", "smo"];
+                                else if (pkgName.includes("seo")) searchNames = ["seo"];
+                                else if (pkgName.includes("smo")) searchNames = ["smo"];
+                                else if (pkgName.includes("content management")) searchNames = ["content management"];
+                                else if (pkgName.includes("website development")) searchNames = ["website development"];
+                                else if (pkgName.includes("brand management")) searchNames = ["brand management"];
+
+                                searchNames.forEach(sName => {
+                                  const match = serviceAreas.find(s =>
+                                    s.name.toLowerCase() === sName ||
+                                    sName.includes(s.name.toLowerCase()) ||
+                                    s.name.toLowerCase().includes(sName)
+                                  );
+                                  if (match && !activeForms.find(f => f.id === match.id)) {
+                                    activeForms.push(match);
+                                  }
+                                });
+                              }
+                            });
+
+                            if (activeForms.length === 0) return "-";
+
+                            // Prioritize Business Requirements for the "Client Details" button
+                            const mainForm = activeForms.find(f => f.name.toLowerCase().includes("business requirement")) || activeForms[0];
+
+                            return (
+                              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                                <button
+                                  onClick={() => navigate(`/requirements/${mainForm.id}/${lead.id}`)}
+                                  style={{
+                                    background: "#6C3A39",
+                                    border: "none",
+                                    color: "#fff",
+                                    padding: "8px 16px",
+                                    borderRadius: "8px",
+                                    fontSize: "0.8rem",
+                                    fontWeight: "700",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: "8px",
+                                    transition: "all 0.2s",
+                                    width: "160px",
+                                    boxShadow: "0 2px 8px rgba(108, 58, 57, 0.2)"
+                                  }}
+                                  onMouseEnter={e => { e.currentTarget.style.background = "#5B3130"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                                  onMouseLeave={e => { e.currentTarget.style.background = "#6C3A39"; e.currentTarget.style.transform = "translateY(0)"; }}
+                                >
+                                  <span>Client Details</span>
+                                  <FiArrow size={14} />
+                                </button>
+                                {activeForms.length > 1 && (
+                                  <span style={{ fontSize: "0.65rem", color: "#aaa", paddingLeft: "4px", fontWeight: "600" }}>
+                                    + {activeForms.length - 1} other requirement{activeForms.length > 2 ? 's' : ''}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </td>
                       </tr>
                     );

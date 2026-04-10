@@ -153,12 +153,14 @@ export const Sidebar = ({ selectedStatus, onStatusChange }) => {
               </div>
             )}
           </div>
-          <NavLink to="/user" className={({ isActive }) =>
-            `dropdown-item ${isActive ? "active" : ""}`
-          }>
-            <FiUser />
-            <span>User Management</span>
-          </NavLink>
+          {(user_role === "ADMIN" || user_role === "SUPERADMIN") && (
+            <NavLink to="/user" className={({ isActive }) =>
+              `dropdown-item ${isActive ? "active" : ""}`
+            }>
+              <FiUser />
+              <span>User Management</span>
+            </NavLink>
+          )}
 
           <NavLink to="/client-portal" className={({ isActive }) =>
             `dropdown-item ${isActive ? "active" : ""}`
